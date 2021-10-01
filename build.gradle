@@ -1,0 +1,29 @@
+plugins {
+    id 'org.jetbrains.intellij' version '0.4.18'
+    id 'java'
+}
+
+group 'com.github.wenzewoo.jetbrains.plugin'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+//    implementation 'com.h2database:h2:1.4.200'
+//    implementation 'cn.hutool:hutool-db:5.7.13'
+
+    implementation 'cn.hutool:hutool-core:5.7.13'
+    implementation 'com.googlecode.cqengine:cqengine:3.6.0'
+}
+
+// See https://github.com/JetBrains/gradle-intellij-plugin/
+intellij {
+    version = 'IC-2019.3'
+    updateSinceUntilBuild = false
+}
+patchPluginXml {
+    changeNotes = """
+      2021-10-01: First version"""
+}
