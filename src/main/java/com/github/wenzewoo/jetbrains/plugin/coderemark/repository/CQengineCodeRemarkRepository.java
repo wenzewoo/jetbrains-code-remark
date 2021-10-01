@@ -53,9 +53,8 @@ public class CQengineCodeRemarkRepository implements CodeRemarkRepository {
         try {
             Files.walk(SerializationUtils.SAVE_PATH).forEach(file -> {
                 final List<CodeRemark> codeRemarks = SerializationUtils.loadFromDisk(file.toFile());
-                if (null != codeRemarks && codeRemarks.size() > 0) {
+                if (null != codeRemarks && codeRemarks.size() > 0)
                     mCodeRemarks.addAll(codeRemarks); // First load, loading with local file.
-                }
             });
         } catch (IOException e) {
             e.printStackTrace();
@@ -69,12 +68,16 @@ public class CQengineCodeRemarkRepository implements CodeRemarkRepository {
 
         @SuppressWarnings("ResultOfMethodCallIgnored")
         public static void persistToDisk(String filePath) {
+            final File saveFolder = SAVE_PATH.toFile();
+
+            if (!saveFolder.exists())
+                saveFolder.mkdirs(); // if saveFolder not exists, mkdir it.
+
             final List<CodeRemark> fileCodeRemarks = mCodeRemarks.retrieve(
                     equal(CodeRemark.FILE_PATH, filePath)).stream().collect(Collectors.toList());
 
             final File file = Paths.get(
-                    SAVE_PATH.toFile().getAbsolutePath(),
-                    Utils.hashMD5(filePath) + ".bin").toFile();
+                    saveFolder.getAbsolutePath(), Utils.hashMD5(filePath) + ".bin").toFile();
 
             if (fileCodeRemarks.size() == 0 && file.exists())
                 file.delete(); // if no more data, remove disk file.
