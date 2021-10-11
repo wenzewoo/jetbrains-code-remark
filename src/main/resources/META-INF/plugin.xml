@@ -29,22 +29,20 @@
 
     <description><![CDATA[
     <img src="https://raw.githubusercontent.com/wenzewoo/jetbrains-code-remark/master/screenshots/coderemark-example.gif"/>
-    <br/>
 
-    源码是只读文件，如何添加备注？使用该插件让你在阅读框架源码时如虎添翼。
-    <h4>如何使用？</h4>
+    <br/>
+    The source code is a read-only file, how to add remarks?
+    <li>1, enter the source file to be read. </li>
+    <li>2, wherever needed, press the <em>Alt + Enter<em> shortcut key. </li>
+    <li>3, select <em>[MARK] Add Code Mark<em>, enter the remarks, and press the <em>Esc<em> button to save. </li>
+    <li>4，For lines that already have remarks, you can still press the shortcut key <em>Alt + Enter<em> to select the corresponding option to edit or delete.</li>
+
+    <br/>
+    源码是只读文件，如何添加备注？
     <li>1，进入需要阅读的源码文件。</li>
     <li>2，在任何需要的地方，按下 <em>Alt + Enter</em> 快捷键。</li>
     <li>3，选择 <em>[MARK] Add Code Mark</em>，输入备注信息，按下 <em>Esc</em> 按钮保存即可。</li>
     <li>4，已经有备注的行，你依然可以继续按下 <em>Alt + Enter</em> 快捷键，选择对应的选项，进行编辑或者删除。</li>
-
-    <hr/>
-    The source code is a read-only file, how to add remarks? Use this plug-in to make you feel even more powerful when reading the framework source code.
-    <h4>How to use? <h4>
-    <li>1, enter the source file to be read. <li>
-    <li>2, wherever needed, press the <em>Alt + Enter<em> shortcut key. <li>
-    <li>3, select <em>[MARK] Add Code Mark<em>, enter the remarks, and press the <em>Esc<em> button to save. <li>
-    <li>4，For lines that already have remarks, you can still press the shortcut key <em>Alt + Enter<em> to select the corresponding option to edit or delete.</li>
     ]]>
 
     </description>
