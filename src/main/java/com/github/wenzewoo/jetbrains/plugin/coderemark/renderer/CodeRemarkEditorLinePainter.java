@@ -61,11 +61,11 @@ public class CodeRemarkEditorLinePainter extends EditorLinePainter {
         if (lines.stream().anyMatch(line -> NumberUtil.equals(line, lineNumber))) {
             final String summary = CodeRemarkRepositoryFactory.getInstance().getSummary(file.getCanonicalPath(), lineNumber);
             if (StrUtil.isNotEmpty(summary)) {
-                result.add(new LineExtensionInfo("//[MARK]: ",
-                        new TextAttributes(JBColor.gray, null, JBColor.gray, EffectType.SEARCH_MATCH, Font.BOLD)));
+                result.add(new LineExtensionInfo("// [MARK]: ",
+                        new TextAttributes(JBColor.red, null, JBColor.red, EffectType.SEARCH_MATCH, Font.BOLD | Font.ITALIC)));
 
                 result.add(new LineExtensionInfo(summary,
-                        new TextAttributes(JBColor.gray, null, JBColor.gray, EffectType.BOXED, Font.PLAIN)));
+                        new TextAttributes(JBColor.red, null, JBColor.red, EffectType.BOXED, Font.ITALIC)));
 
                 rendererState.incrementLine(file.getCanonicalPath())
                         .appendPrevExtensionInfo(file.getCanonicalPath(), lineNumber, result);

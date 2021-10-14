@@ -190,15 +190,13 @@ public class CrudIntentionAction {
             editorPane.setText(CodeRemarkRepositoryFactory.getInstance().getText(filePath, lineNumber));
 
             final JBScrollPane scrollPane = new JBScrollPane(editorPane);
-            scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-            scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
             scrollPane.setBorder(BorderFactory.createEmptyBorder());
             scrollPane.setPreferredSize(new JBDimension(300, 80));
 
 
             final JBPopupFactory popupFactory = JBPopupFactory.getInstance();
-
-            final Balloon balloon = popupFactory.createDialogBalloonBuilder(scrollPane, title)
+            final Balloon balloon = popupFactory.createDialogBalloonBuilder(
+                            scrollPane, title + ":" + (lineNumber + 1))
                     .setDialogMode(false)
                     .setHideOnClickOutside(true)
                     .setCloseButtonEnabled(false)
@@ -227,7 +225,6 @@ public class CrudIntentionAction {
                 @Override
                 public void keyTyped(final KeyEvent e) {
                     // Skipped.
-                    editorPane.setCaretPosition(editorPane.getText().length());
                 }
 
                 @Override
