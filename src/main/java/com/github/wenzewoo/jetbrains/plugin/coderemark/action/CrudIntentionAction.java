@@ -26,7 +26,6 @@ package com.github.wenzewoo.jetbrains.plugin.coderemark.action;
 
 import cn.hutool.core.util.StrUtil;
 import com.github.wenzewoo.jetbrains.plugin.coderemark.Utils;
-import com.github.wenzewoo.jetbrains.plugin.coderemark.form.CodeRemarkEditorForm;
 import com.github.wenzewoo.jetbrains.plugin.coderemark.repository.CodeRemarkRepositoryFactory;
 import com.intellij.codeInsight.intention.impl.BaseIntentionAction;
 import com.intellij.openapi.editor.Editor;
@@ -38,7 +37,9 @@ import com.intellij.openapi.ui.popup.JBPopupListener;
 import com.intellij.openapi.ui.popup.LightweightWindowEvent;
 import com.intellij.psi.PsiFile;
 import com.intellij.serviceContainer.NonInjectable;
+import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.IncorrectOperationException;
+import com.intellij.util.ui.JBDimension;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
@@ -178,14 +179,26 @@ public class CrudIntentionAction {
         protected void showEditorPopup(
                 final String title, final Editor editor, final Base.EditorPopupSaveListener saveListener) {
 
-            final CodeRemarkEditorForm remarkEditor = new CodeRemarkEditorForm();
-            final JEditorPane editorPane = remarkEditor.getEditorPane();
-            final JBPopupFactory popupFactory = JBPopupFactory.getInstance();
-
             final String filePath = Utils.filePath(editor);
             final Integer lineNumber = Utils.lineNumber(editor);
 
-            final Balloon balloon = popupFactory.createDialogBalloonBuilder(remarkEditor.getRootPane(), title)
+
+            final JEditorPane editorPane = new JEditorPane();
+            editorPane.setPreferredSize(new JBDimension(300, 80));
+            editorPane.requestFocus();
+            editorPane.setBorder(BorderFactory.createEmptyBorder());
+            editorPane.setText(CodeRemarkRepositoryFactory.getInstance().getText(filePath, lineNumber));
+
+            final JBScrollPane scrollPane = new JBScrollPane(editorPane);
+            scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+            scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+            scrollPane.setBorder(BorderFactory.createEmptyBorder());
+            scrollPane.setPreferredSize(new JBDimension(300, 80));
+
+
+            final JBPopupFactory popupFactory = JBPopupFactory.getInstance();
+
+            final Balloon balloon = popupFactory.createDialogBalloonBuilder(scrollPane, title)
                     .setDialogMode(false)
                     .setHideOnClickOutside(true)
                     .setCloseButtonEnabled(false)
@@ -198,7 +211,7 @@ public class CrudIntentionAction {
             balloon.addListener(new JBPopupListener() {
                 @Override
                 public void onClosed(@NotNull final LightweightWindowEvent event) {
-                    final String text = remarkEditor.getEditorPane().getText();
+                    final String text = editorPane.getText();
                     if (!StrUtil.isEmpty(text))
                         saveListener.handle(filePath, lineNumber, text);
                 }
@@ -214,6 +227,7 @@ public class CrudIntentionAction {
                 @Override
                 public void keyTyped(final KeyEvent e) {
                     // Skipped.
+                    editorPane.setCaretPosition(editorPane.getText().length());
                 }
 
                 @Override
