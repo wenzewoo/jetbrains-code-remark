@@ -26,6 +26,7 @@ package com.github.wenzewoo.jetbrains.plugin.coderemark;
 
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ex.EditorEx;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 
 import java.math.BigInteger;
@@ -34,29 +35,37 @@ import java.security.NoSuchAlgorithmException;
 
 public class Utils {
 
-    public static String hashMD5(String input) {
+    public static String hashMD5(final String input) {
         if (input == null || input.length() == 0) return null;
         try {
-            MessageDigest md5 = MessageDigest.getInstance("MD5");
+            final MessageDigest md5 = MessageDigest.getInstance("MD5");
             md5.update(input.getBytes());
-            byte[] byteArray = md5.digest();
-            BigInteger bigInt = new BigInteger(1, byteArray);
-            StringBuilder result = new StringBuilder(bigInt.toString(16));
+            final byte[] byteArray = md5.digest();
+            final BigInteger bigInt = new BigInteger(1, byteArray);
+            final StringBuilder result = new StringBuilder(bigInt.toString(16));
             while (result.length() < 32) result.insert(0, "0");
             return result.toString().toUpperCase();
-        } catch (NoSuchAlgorithmException e) {
+        } catch (final NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
         return input;
     }
 
-    public static Integer lineNumber(Editor editor) {
+    public static String lineText(final Editor editor, final int lineNumber) {
+        if (null == editor) return null;
+
+        final int startOffset = editor.getDocument().getLineStartOffset(lineNumber);
+        final int endOffset = editor.getDocument().getLineEndOffset(lineNumber);
+        return editor.getDocument().getText(new TextRange(startOffset, endOffset));
+    }
+
+    public static Integer lineNumber(final Editor editor) {
         if (null == editor) return null;
 
         return editor.getDocument().getLineNumber(editor.getCaretModel().getOffset());
     }
 
-    public static String filePath(Editor editor) {
+    public static String filePath(final Editor editor) {
 
         if (editor instanceof EditorEx) {
 

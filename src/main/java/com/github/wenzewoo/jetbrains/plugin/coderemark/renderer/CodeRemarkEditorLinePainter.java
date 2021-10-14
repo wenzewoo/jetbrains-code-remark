@@ -22,14 +22,14 @@
  * SOFTWARE.
  */
 
-package com.github.wenzewoo.jetbrains.plugin.coderemark.painter;
+package com.github.wenzewoo.jetbrains.plugin.coderemark.renderer;
 
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.github.wenzewoo.jetbrains.plugin.coderemark.repository.CodeRemarkRepositoryFactory;
-import com.github.wenzewoo.jetbrains.plugin.coderemark.state.CodeRemarkLoadState;
 import com.intellij.openapi.editor.EditorLinePainter;
 import com.intellij.openapi.editor.LineExtensionInfo;
+import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -49,11 +49,11 @@ public class CodeRemarkEditorLinePainter extends EditorLinePainter {
     @Override
     public Collection<LineExtensionInfo> getLineExtensions(
             @NotNull final Project project, @NotNull final VirtualFile file, final int lineNumber) {
-        final CodeRemarkLoadState loadState = CodeRemarkLoadState.getInstance();
+        final CodeRemarkRendererState rendererState = CodeRemarkRendererState.getInstance();
 
-        if (loadState.get(file.getCanonicalPath())) {
+        if (rendererState.get(file.getCanonicalPath())) {
             // this file is loaded, skipped, show prev extension info.
-            return loadState.getPrevExtensionInfo(file.getCanonicalPath(), lineNumber);
+            return rendererState.getPrevExtensionInfo(file.getCanonicalPath(), lineNumber);
         }
 
         final List<LineExtensionInfo> result = new ArrayList<>();
@@ -61,15 +61,18 @@ public class CodeRemarkEditorLinePainter extends EditorLinePainter {
         if (lines.stream().anyMatch(line -> NumberUtil.equals(line, lineNumber))) {
             final String summary = CodeRemarkRepositoryFactory.getInstance().getSummary(file.getCanonicalPath(), lineNumber);
             if (StrUtil.isNotEmpty(summary)) {
-                result.add(new LineExtensionInfo(" \uD83D\uDC48" + summary,
-                        new TextAttributes(null, null, JBColor.RED, null, Font.PLAIN)));
+                result.add(new LineExtensionInfo("//[MARK]: ",
+                        new TextAttributes(JBColor.gray, null, JBColor.gray, EffectType.SEARCH_MATCH, Font.BOLD)));
 
-                loadState.incrementLine(file.getCanonicalPath())
+                result.add(new LineExtensionInfo(summary,
+                        new TextAttributes(JBColor.gray, null, JBColor.gray, EffectType.BOXED, Font.PLAIN)));
+
+                rendererState.incrementLine(file.getCanonicalPath())
                         .appendPrevExtensionInfo(file.getCanonicalPath(), lineNumber, result);
             }
         }
-        if (loadState.loadedLineCount(file.getCanonicalPath()) == lines.size()) {
-            loadState.resetLine(file.getCanonicalPath()).set(file.getCanonicalPath(), true); // loading completed
+        if (rendererState.loadedLineCount(file.getCanonicalPath()) == lines.size()) {
+            rendererState.resetLine(file.getCanonicalPath()).set(file.getCanonicalPath(), true); // loading completed
         }
         return result;
     }

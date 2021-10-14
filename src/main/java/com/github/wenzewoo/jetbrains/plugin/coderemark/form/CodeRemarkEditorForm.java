@@ -5,7 +5,7 @@ import javax.swing.*;
 public class CodeRemarkEditorForm {
     private JPanel rootPane;
     private JEditorPane editorPane;
-
+    
     public JPanel getRootPane() {
         return rootPane;
     }

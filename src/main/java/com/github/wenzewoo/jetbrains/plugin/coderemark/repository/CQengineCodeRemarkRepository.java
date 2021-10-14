@@ -26,7 +26,7 @@ package com.github.wenzewoo.jetbrains.plugin.coderemark.repository;
 
 import cn.hutool.core.util.StrUtil;
 import com.github.wenzewoo.jetbrains.plugin.coderemark.Utils;
-import com.github.wenzewoo.jetbrains.plugin.coderemark.state.CodeRemarkLoadState;
+import com.github.wenzewoo.jetbrains.plugin.coderemark.renderer.CodeRemarkRendererState;
 import com.google.common.collect.Lists;
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
@@ -56,7 +56,7 @@ public class CQengineCodeRemarkRepository implements CodeRemarkRepository {
                 if (null != codeRemarks && codeRemarks.size() > 0)
                     mCodeRemarks.addAll(codeRemarks); // First load, loading with local file.
             });
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
         mCodeRemarks.addIndex(HashIndex.onAttribute(CodeRemark.FILE_PATH));
@@ -67,7 +67,7 @@ public class CQengineCodeRemarkRepository implements CodeRemarkRepository {
         private final static Path SAVE_PATH = Paths.get(System.getProperty("user.home"), ".code-remark");
 
         @SuppressWarnings("ResultOfMethodCallIgnored")
-        public static void persistToDisk(String filePath) {
+        public static void persistToDisk(final String filePath) {
             final File saveFolder = SAVE_PATH.toFile();
 
             if (!saveFolder.exists())
@@ -89,19 +89,19 @@ public class CQengineCodeRemarkRepository implements CodeRemarkRepository {
                 try (final ObjectOutputStream stream = new ObjectOutputStream(
                         new FileOutputStream(file))) {
                     stream.writeObject(fileCodeRemarks.toArray(new CodeRemark[0]));
-                } catch (Throwable ignored) {
+                } catch (final Throwable ignored) {
                 }
             }
         }
 
-        public static List<CodeRemark> loadFromDisk(File file) {
+        public static List<CodeRemark> loadFromDisk(final File file) {
             if (!file.exists())
                 return Lists.newArrayList();
 
             try (final ObjectInputStream stream = new ObjectInputStream(
                     new FileInputStream(file))) {
                 return Arrays.asList((CodeRemark[]) stream.readObject());
-            } catch (Throwable e) {
+            } catch (final Throwable e) {
                 return Lists.newArrayList();
             }
         }
@@ -109,25 +109,25 @@ public class CQengineCodeRemarkRepository implements CodeRemarkRepository {
 
 
     @Override
-    public List<Integer> lines(String filePath) {
+    public List<Integer> lines(final String filePath) {
         return mCodeRemarks.retrieve(equal(CodeRemark.FILE_PATH, filePath))
                 .stream().map(CodeRemark::getLineNumber).collect(Collectors.toList());
     }
 
     @Override
-    public Boolean exist(String filePath) {
+    public Boolean exist(final String filePath) {
         return mCodeRemarks.retrieve(equal(CodeRemark.FILE_PATH, filePath)).size() > 0;
     }
 
     @Override
-    public Boolean exist(String filePath, int lineNumber) {
+    public Boolean exist(final String filePath, final int lineNumber) {
         return mCodeRemarks.retrieve(
                 and(equal(CodeRemark.FILE_PATH, filePath),
                         equal(CodeRemark.LINE_NUMBER, lineNumber))).size() > 0;
     }
 
     @Override
-    public String getSummary(String filePath, int lineNumber) {
+    public String getSummary(final String filePath, final int lineNumber) {
         return mCodeRemarks.retrieve(
                         and(equal(CodeRemark.FILE_PATH, filePath),
                                 equal(CodeRemark.LINE_NUMBER, lineNumber)))
@@ -135,7 +135,7 @@ public class CQengineCodeRemarkRepository implements CodeRemarkRepository {
     }
 
     @Override
-    public String getText(String filePath, int lineNumber) {
+    public String getText(final String filePath, final int lineNumber) {
         return mCodeRemarks.retrieve(
                         and(equal(CodeRemark.FILE_PATH, filePath),
                                 equal(CodeRemark.LINE_NUMBER, lineNumber)))
@@ -143,14 +143,14 @@ public class CQengineCodeRemarkRepository implements CodeRemarkRepository {
     }
 
     @Override
-    public void save(String filePath, int lineNumber, String text) {
+    public void save(final String filePath, final int lineNumber, final String text) {
         mCodeRemarks.add(new CodeRemark(filePath, lineNumber, text));
         SerializationUtils.persistToDisk(filePath); // To disk
-        CodeRemarkLoadState.getInstance().resetLine(filePath).set(filePath, false);
+        CodeRemarkRendererState.getInstance().resetLine(filePath).set(filePath, false);
     }
 
     @Override
-    public void update(String filePath, int lineNumber, String text) {
+    public void update(final String filePath, final int lineNumber, final String text) {
         final CodeRemark codeRemark = mCodeRemarks.retrieve(
                         and(equal(CodeRemark.FILE_PATH, filePath),
                                 equal(CodeRemark.LINE_NUMBER, lineNumber)))
@@ -161,26 +161,26 @@ public class CQengineCodeRemarkRepository implements CodeRemarkRepository {
             codeRemark.setText(text);
             mCodeRemarks.add(codeRemark);
             SerializationUtils.persistToDisk(filePath); // To disk
-            CodeRemarkLoadState.getInstance().resetLine(filePath).set(filePath, false);
+            CodeRemarkRendererState.getInstance().resetLine(filePath).set(filePath, false);
         }
     }
 
     @Override
-    public void delete(String filePath, int lineNumber) {
+    public void delete(final String filePath, final int lineNumber) {
         mCodeRemarks.retrieve(
                         and(equal(CodeRemark.FILE_PATH, filePath),
                                 equal(CodeRemark.LINE_NUMBER, lineNumber)))
                 .stream().findFirst().ifPresent(mCodeRemarks::remove);
         SerializationUtils.persistToDisk(filePath); // To disk
-        CodeRemarkLoadState.getInstance().resetLine(filePath).resetPrevExtensionInfo(filePath).set(filePath, false);
+        CodeRemarkRendererState.getInstance().resetLine(filePath).resetPrevExtensionInfo(filePath).set(filePath, false);
     }
 
     @Override
-    public void delete(String filePath) {
+    public void delete(final String filePath) {
         mCodeRemarks.retrieve(equal(CodeRemark.FILE_PATH, filePath))
                 .stream().filter(Objects::nonNull).forEach(mCodeRemarks::remove);
         SerializationUtils.persistToDisk(filePath); // To disk
-        CodeRemarkLoadState.getInstance().resetLine(filePath).resetPrevExtensionInfo(filePath).set(filePath, false);
+        CodeRemarkRendererState.getInstance().resetLine(filePath).resetPrevExtensionInfo(filePath).set(filePath, false);
     }
 
     static class CodeRemark implements Serializable {
@@ -195,7 +195,7 @@ public class CQengineCodeRemarkRepository implements CodeRemarkRepository {
         public CodeRemark() {
         }
 
-        public CodeRemark(String filePath, Integer lineNumber, String text) {
+        public CodeRemark(final String filePath, final Integer lineNumber, final String text) {
             this.filePath = filePath;
             this.lineNumber = lineNumber;
             this.text = text;
@@ -205,7 +205,7 @@ public class CQengineCodeRemarkRepository implements CodeRemarkRepository {
             return filePath;
         }
 
-        public CodeRemark setFilePath(String filePath) {
+        public CodeRemark setFilePath(final String filePath) {
             this.filePath = filePath;
             return this;
         }
@@ -214,20 +214,20 @@ public class CQengineCodeRemarkRepository implements CodeRemarkRepository {
             return lineNumber;
         }
 
-        public CodeRemark setLineNumber(Integer lineNumber) {
+        public CodeRemark setLineNumber(final Integer lineNumber) {
             this.lineNumber = lineNumber;
             return this;
         }
 
         public String getSummary() {
-            return StrUtil.maxLength(this.text, 17);
+            return StrUtil.maxLength(this.text, 35);
         }
 
         public String getText() {
             return text;
         }
 
-        public CodeRemark setText(String text) {
+        public CodeRemark setText(final String text) {
             this.text = text;
             return this;
         }

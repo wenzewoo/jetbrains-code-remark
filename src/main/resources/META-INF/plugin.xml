@@ -52,25 +52,23 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <editor.linePainter
-                implementation="com.github.wenzewoo.jetbrains.plugin.coderemark.painter.CodeRemarkEditorLinePainter"/>
+                implementation="com.github.wenzewoo.jetbrains.plugin.coderemark.renderer.CodeRemarkEditorLinePainter"/>
+
+
         <intentionAction>
-            <className>com.github.wenzewoo.jetbrains.plugin.coderemark.action.AddCodeRemarkIntentionAction</className>
+            <className>com.github.wenzewoo.jetbrains.plugin.coderemark.action.CrudIntentionAction$Add</className>
         </intentionAction>
 
         <intentionAction>
-            <className>com.github.wenzewoo.jetbrains.plugin.coderemark.action.EditCodeRemarkIntentionAction</className>
+            <className>com.github.wenzewoo.jetbrains.plugin.coderemark.action.CrudIntentionAction$Edit</className>
         </intentionAction>
 
         <intentionAction>
-            <className>com.github.wenzewoo.jetbrains.plugin.coderemark.action.ShowCodeRemarkIntentionAction</className>
+            <className>com.github.wenzewoo.jetbrains.plugin.coderemark.action.CrudIntentionAction$Remove</className>
         </intentionAction>
 
         <intentionAction>
-            <className>com.github.wenzewoo.jetbrains.plugin.coderemark.action.DelCodeRemarkIntentionAction</className>
-        </intentionAction>
-
-        <intentionAction>
-            <className>com.github.wenzewoo.jetbrains.plugin.coderemark.action.CleanCodeRemarkIntentionAction</className>
+            <className>com.github.wenzewoo.jetbrains.plugin.coderemark.action.CrudIntentionAction$Detail</className>
         </intentionAction>
     </extensions>
 </idea-plugin>

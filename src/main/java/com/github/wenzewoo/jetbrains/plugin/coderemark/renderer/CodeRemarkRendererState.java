@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.github.wenzewoo.jetbrains.plugin.coderemark.state;
+package com.github.wenzewoo.jetbrains.plugin.coderemark.renderer;
 
 import cn.hutool.core.util.StrUtil;
 import com.intellij.openapi.editor.LineExtensionInfo;
@@ -33,13 +33,13 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings("UnusedReturnValue")
-public class CodeRemarkLoadState {
+public class CodeRemarkRendererState {
     public final static Map<String, Boolean> mStateMap = new ConcurrentHashMap<>();
     public final static Map<String, Integer> mLoadedLineCountMap = new ConcurrentHashMap<>();
     public final static Map<String, List<LineExtensionInfo>> mPrevExtensionInfoMap = new ConcurrentHashMap<>();
 
-    public synchronized CodeRemarkLoadState appendPrevExtensionInfo(
-            String filePath, Integer lineNumber, List<LineExtensionInfo> extensionInfo) {
+    public synchronized CodeRemarkRendererState appendPrevExtensionInfo(
+            final String filePath, final Integer lineNumber, final List<LineExtensionInfo> extensionInfo) {
         final String key = filePath + "#" + lineNumber;
         final List<LineExtensionInfo> extensionInfoList = mPrevExtensionInfoMap
                 .getOrDefault(key, new ArrayList<>());
@@ -50,55 +50,55 @@ public class CodeRemarkLoadState {
         return this;
     }
 
-    public synchronized List<LineExtensionInfo> getPrevExtensionInfo(String filePath, Integer lineNumber) {
+    public synchronized List<LineExtensionInfo> getPrevExtensionInfo(final String filePath, final Integer lineNumber) {
         return mPrevExtensionInfoMap.get(filePath + "#" + lineNumber);
     }
 
-    public synchronized CodeRemarkLoadState resetPrevExtensionInfo(String filePath) {
-        for (String key : mPrevExtensionInfoMap.keySet()) {
+    public synchronized CodeRemarkRendererState resetPrevExtensionInfo(final String filePath) {
+        for (final String key : mPrevExtensionInfoMap.keySet()) {
             if (StrUtil.startWith(key, filePath))
                 mPrevExtensionInfoMap.remove(key);
         }
         return this;
     }
 
-    public synchronized CodeRemarkLoadState incrementLine(String filePath) {
+    public synchronized CodeRemarkRendererState incrementLine(final String filePath) {
         mLoadedLineCountMap.put(filePath, mLoadedLineCountMap.getOrDefault(filePath, 0) + 1);
         return this;
     }
 
-    public synchronized CodeRemarkLoadState resetLine(String filePath) {
+    public synchronized CodeRemarkRendererState resetLine(final String filePath) {
         mLoadedLineCountMap.remove(filePath);
         return this;
     }
 
-    public synchronized int loadedLineCount(String filePath) {
+    public synchronized int loadedLineCount(final String filePath) {
         return mLoadedLineCountMap.getOrDefault(filePath, 0);
     }
 
 
-    public synchronized CodeRemarkLoadState set(String filePath, Boolean state) {
+    public synchronized CodeRemarkRendererState set(final String filePath, final Boolean state) {
         mStateMap.put(filePath, state);
         return this;
     }
 
-    public synchronized Boolean get(String filePath) {
+    public synchronized Boolean get(final String filePath) {
         return mStateMap.getOrDefault(filePath, false);
     }
 
-    public static CodeRemarkLoadState getInstance() {
+    public static CodeRemarkRendererState getInstance() {
         return Singleton.INSTANCE.getInstance();
     }
 
     private enum Singleton {
         INSTANCE;
-        private final CodeRemarkLoadState instance;
+        private final CodeRemarkRendererState instance;
 
         Singleton() {
-            instance = new CodeRemarkLoadState();
+            instance = new CodeRemarkRendererState();
         }
 
-        public CodeRemarkLoadState getInstance() {
+        public CodeRemarkRendererState getInstance() {
             return instance;
         }
     }
