@@ -48,15 +48,13 @@ public class CodeRemarkEditorLinePainter extends EditorLinePainter {
     @Nullable
     @Override
     public Collection<LineExtensionInfo> getLineExtensions(
-            @NotNull Project project, @NotNull VirtualFile file, int lineNumber) {
+            @NotNull final Project project, @NotNull final VirtualFile file, final int lineNumber) {
         final CodeRemarkLoadState loadState = CodeRemarkLoadState.getInstance();
 
         if (loadState.get(file.getCanonicalPath())) {
             // this file is loaded, skipped, show prev extension info.
             return loadState.getPrevExtensionInfo(file.getCanonicalPath(), lineNumber);
         }
-        System.out.println(loadState.loadedLineCount(file.getCanonicalPath())
-                + " >>" + file.getCanonicalPath() + ", " + lineNumber);
 
         final List<LineExtensionInfo> result = new ArrayList<>();
         final List<Integer> lines = CodeRemarkRepositoryFactory.getInstance().lines(file.getCanonicalPath());

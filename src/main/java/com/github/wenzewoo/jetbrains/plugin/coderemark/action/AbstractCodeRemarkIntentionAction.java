@@ -64,7 +64,7 @@ public abstract class AbstractCodeRemarkIntentionAction extends BaseIntentionAct
         void handle(String value);
     }
 
-    protected void showEditorPopup(String title, Editor editor, String defaultVal, OnEditorSaveListener saveListener) {
+    protected void showEditorPopup(final String title, final Editor editor, final String defaultVal, final OnEditorSaveListener saveListener) {
         final CodeRemarkEditorForm remarkEditor = new CodeRemarkEditorForm();
         final JEditorPane editorPane = remarkEditor.getEditorPane();
 
@@ -85,24 +85,24 @@ public abstract class AbstractCodeRemarkIntentionAction extends BaseIntentionAct
             long prev = System.currentTimeMillis();
 
             @Override
-            public void keyTyped(KeyEvent e) {
+            public void keyTyped(final KeyEvent e) {
                 // Skipped.
             }
 
             @Override
-            public void keyPressed(KeyEvent e) {
+            public void keyPressed(final KeyEvent e) {
                 // Skipped.
             }
 
             @Override
-            public void keyReleased(KeyEvent e) {
-                if (e.getKeyCode() == 27) {
-                    if (System.currentTimeMillis() - prev < interval)
-                        balloon.hide(); // Two consecutive times
-                    prev = System.currentTimeMillis();
-                    if (StrUtil.isEmpty(editorPane.getText())) return; // Skipped.
-                    saveListener.handle(editorPane.getText());
-                    balloon.hide();
+            public void keyReleased(final KeyEvent e) {
+                if (e.getKeyCode() == 27) { // Esc
+                    if (!(System.currentTimeMillis() - prev < interval)) {
+                        prev = System.currentTimeMillis();
+                        if (!StrUtil.isEmpty(editorPane.getText()))
+                            saveListener.handle(editorPane.getText());
+                    }
+                    balloon.hide(); // Two consecutive times
                 }
             }
         });
