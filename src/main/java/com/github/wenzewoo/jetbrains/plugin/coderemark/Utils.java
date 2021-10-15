@@ -76,4 +76,31 @@ public class Utils {
         }
         return "";
     }
+
+    public static boolean isEmpty(final String text) {
+        return null == text || "".equals(text.trim());
+    }
+
+    public static boolean isNotEmpty(final String text) {
+        return !isEmpty(text);
+    }
+
+    public static String maxLength(final String text, final int length) {
+        if (isEmpty(text)) return text;
+        if (text.length() <= length) return text;
+
+        return String.format("%s...", text.substring(0, length - 1));
+    }
+
+    public static boolean endsWith(final String text, final String suffix) {
+        if (isEmpty(text)) return false;
+
+        return text.endsWith(suffix);
+    }
+
+    public static boolean startsWith(final String text, final String prefix) {
+        if (isEmpty(text)) return false;
+
+        return text.startsWith(prefix);
+    }
 }

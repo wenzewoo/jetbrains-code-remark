@@ -35,8 +35,7 @@ public class CodeRemarkRepositoryFactory {
         private final CodeRemarkRepository instance;
 
         Singleton() {
-            instance = new LoggingCodeRemarkRepository(
-                    new CQengineCodeRemarkRepository());
+            instance = new CQengineCodeRemarkRepository();
         }
 
         public CodeRemarkRepository getInstance() {

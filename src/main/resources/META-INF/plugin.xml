@@ -68,6 +68,10 @@
         </intentionAction>
 
         <intentionAction>
+            <className>com.github.wenzewoo.jetbrains.plugin.coderemark.action.CrudIntentionAction$RemoveAll</className>
+        </intentionAction>
+
+        <intentionAction>
             <className>com.github.wenzewoo.jetbrains.plugin.coderemark.action.CrudIntentionAction$Detail</className>
         </intentionAction>
     </extensions>

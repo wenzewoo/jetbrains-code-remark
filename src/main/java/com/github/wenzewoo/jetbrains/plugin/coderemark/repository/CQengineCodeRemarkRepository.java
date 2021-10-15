@@ -24,7 +24,6 @@
 
 package com.github.wenzewoo.jetbrains.plugin.coderemark.repository;
 
-import cn.hutool.core.util.StrUtil;
 import com.github.wenzewoo.jetbrains.plugin.coderemark.Utils;
 import com.github.wenzewoo.jetbrains.plugin.coderemark.renderer.CodeRemarkRendererState;
 import com.google.common.collect.Lists;
@@ -220,7 +219,7 @@ public class CQengineCodeRemarkRepository implements CodeRemarkRepository {
         }
 
         public String getSummary() {
-            return StrUtil.maxLength(this.text, 35);
+            return Utils.maxLength(this.text, 25);
         }
 
         public String getText() {

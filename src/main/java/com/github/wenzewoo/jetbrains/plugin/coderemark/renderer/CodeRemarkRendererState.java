@@ -24,7 +24,7 @@
 
 package com.github.wenzewoo.jetbrains.plugin.coderemark.renderer;
 
-import cn.hutool.core.util.StrUtil;
+import com.github.wenzewoo.jetbrains.plugin.coderemark.Utils;
 import com.intellij.openapi.editor.LineExtensionInfo;
 
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public class CodeRemarkRendererState {
 
     public synchronized CodeRemarkRendererState resetPrevExtensionInfo(final String filePath) {
         for (final String key : mPrevExtensionInfoMap.keySet()) {
-            if (StrUtil.startWith(key, filePath))
+            if (Utils.startsWith(key, filePath))
                 mPrevExtensionInfoMap.remove(key);
         }
         return this;

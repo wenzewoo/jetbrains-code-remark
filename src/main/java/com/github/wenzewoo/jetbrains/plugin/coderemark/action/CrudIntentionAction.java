@@ -24,7 +24,6 @@
 
 package com.github.wenzewoo.jetbrains.plugin.coderemark.action;
 
-import cn.hutool.core.util.StrUtil;
 import com.github.wenzewoo.jetbrains.plugin.coderemark.Utils;
 import com.github.wenzewoo.jetbrains.plugin.coderemark.repository.CodeRemarkRepositoryFactory;
 import com.intellij.codeInsight.intention.impl.BaseIntentionAction;
@@ -53,6 +52,7 @@ public class CrudIntentionAction {
     public CrudIntentionAction() {
     }
 
+    @SuppressWarnings("IntentionDescriptionNotFoundInspection")
     public static class Add extends Base {
 
         @Override
@@ -62,7 +62,7 @@ public class CrudIntentionAction {
 
         @Override
         public boolean isAvailable(@NotNull final Project project, final Editor editor, final PsiFile file) {
-            return !CodeRemarkRepositoryFactory.getInstance().exist(
+            return null != file && !CodeRemarkRepositoryFactory.getInstance().exist(
                     Utils.filePath(editor), Utils.lineNumber(editor));
         }
 
@@ -75,6 +75,7 @@ public class CrudIntentionAction {
         }
     }
 
+    @SuppressWarnings("IntentionDescriptionNotFoundInspection")
     public static class Edit extends Base {
 
         @Override
@@ -84,7 +85,7 @@ public class CrudIntentionAction {
 
         @Override
         public boolean isAvailable(@NotNull final Project project, final Editor editor, final PsiFile file) {
-            return CodeRemarkRepositoryFactory.getInstance().exist(
+            return null != file && CodeRemarkRepositoryFactory.getInstance().exist(
                     Utils.filePath(editor), Utils.lineNumber(editor));
         }
 
@@ -97,6 +98,7 @@ public class CrudIntentionAction {
         }
     }
 
+    @SuppressWarnings("IntentionDescriptionNotFoundInspection")
     public static class Remove extends Base {
 
         @Override
@@ -106,18 +108,45 @@ public class CrudIntentionAction {
 
         @Override
         public boolean isAvailable(@NotNull final Project project, final Editor editor, final PsiFile file) {
-            return CodeRemarkRepositoryFactory.getInstance().exist(
+            return null != file && CodeRemarkRepositoryFactory.getInstance().exist(
                     Utils.filePath(editor), Utils.lineNumber(editor));
         }
 
         @Override
         public void invoke(@NotNull final Project project, final Editor editor, final PsiFile file)
                 throws IncorrectOperationException {
-            CodeRemarkRepositoryFactory.getInstance().delete(
-                    Utils.filePath(editor), Utils.lineNumber(editor));
+            JBPopupFactory.getInstance().createConfirmation(
+                    "Remove remark with this line?", () -> {
+                        CodeRemarkRepositoryFactory.getInstance().delete(
+                                Utils.filePath(editor), Utils.lineNumber(editor));
+                    }, 1).showInBestPositionFor(editor);
         }
     }
 
+    @SuppressWarnings("IntentionDescriptionNotFoundInspection")
+    public static class RemoveAll extends Base {
+
+        @Override
+        String getName() {
+            return "[MARK] Remove remark with this file";
+        }
+
+        @Override
+        public boolean isAvailable(@NotNull final Project project, final Editor editor, final PsiFile file) {
+            return null != file && CodeRemarkRepositoryFactory.getInstance().exist(Utils.filePath(editor));
+        }
+
+        @Override
+        public void invoke(@NotNull final Project project, final Editor editor, final PsiFile file)
+                throws IncorrectOperationException {
+            JBPopupFactory.getInstance().createConfirmation(
+                    "Remove remark with this file?", () -> {
+                        CodeRemarkRepositoryFactory.getInstance().delete(Utils.filePath(editor));
+                    }, 1).showInBestPositionFor(editor);
+        }
+    }
+
+    @SuppressWarnings("IntentionDescriptionNotFoundInspection")
     public static class Detail extends Base {
         @Override
         String getName() {
@@ -128,24 +157,34 @@ public class CrudIntentionAction {
         public boolean isAvailable(@NotNull final Project project, final Editor editor, final PsiFile file) {
             final String summary = CodeRemarkRepositoryFactory.getInstance().getSummary(
                     Utils.filePath(editor), Utils.lineNumber(editor));
-            return StrUtil.isNotEmpty(summary) && StrUtil.endWith(summary, "..");
+            return null != file && Utils.isNotEmpty(summary) && Utils.endsWith(summary, "..");
         }
 
         @Override
         public void invoke(@NotNull final Project project, final Editor editor, final PsiFile file)
                 throws IncorrectOperationException {
-            final String text = CodeRemarkRepositoryFactory.getInstance().getText(
-                    Utils.filePath(editor), Utils.lineNumber(editor));
 
-            if (StrUtil.isNotEmpty(text)) {
+            final String filePath = Utils.filePath(editor);
+            final Integer lineNumber = Utils.lineNumber(editor);
+            final String text = CodeRemarkRepositoryFactory.getInstance().getText(filePath, lineNumber);
+
+            if (Utils.isNotEmpty(text)) {
                 final JBPopupFactory popupFactory = JBPopupFactory.getInstance();
 
                 // new JBColor(new Color(186, 238, 186), new Color(73, 117, 73))
-                popupFactory.createHtmlTextBalloonBuilder(
-                                text, MessageType.INFO, null)
+                final Balloon balloon = popupFactory.createHtmlTextBalloonBuilder(
+                                text, null, MessageType.INFO.getPopupBackground(), null)
                         .setCloseButtonEnabled(false)
-                        .createBalloon()
-                        .show(popupFactory.guessBestPopupLocation(editor), Balloon.Position.below);
+                        .createBalloon();
+
+                CodeRemarkRepositoryFactory.getInstance().delete(filePath, lineNumber);
+                balloon.addListener(new JBPopupListener() {
+                    @Override
+                    public void onClosed(@NotNull final LightweightWindowEvent event) {
+                        CodeRemarkRepositoryFactory.getInstance().save(filePath, lineNumber, text);
+                    }
+                });
+                balloon.show(popupFactory.guessBestPopupLocation(editor), Balloon.Position.below);
             }
         }
     }
@@ -210,7 +249,7 @@ public class CrudIntentionAction {
                 @Override
                 public void onClosed(@NotNull final LightweightWindowEvent event) {
                     final String text = editorPane.getText();
-                    if (!StrUtil.isEmpty(text))
+                    if (Utils.isNotEmpty(text))
                         saveListener.handle(filePath, lineNumber, text);
                 }
             });

@@ -11,12 +11,13 @@ repositories {
 }
 
 dependencies {
-//    implementation 'com.h2database:h2:1.4.200'
-//    implementation 'cn.hutool:hutool-db:5.7.13'
-
-    implementation 'cn.hutool:hutool-core:5.7.13'
     implementation 'com.googlecode.cqengine:cqengine:3.6.0'
 }
+
+configurations {
+    all*.exclude group: 'org.xerial', module: 'sqlite-jdbc'
+}
+
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {

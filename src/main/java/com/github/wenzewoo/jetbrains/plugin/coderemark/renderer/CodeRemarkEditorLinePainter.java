@@ -24,8 +24,7 @@
 
 package com.github.wenzewoo.jetbrains.plugin.coderemark.renderer;
 
-import cn.hutool.core.util.NumberUtil;
-import cn.hutool.core.util.StrUtil;
+import com.github.wenzewoo.jetbrains.plugin.coderemark.Utils;
 import com.github.wenzewoo.jetbrains.plugin.coderemark.repository.CodeRemarkRepositoryFactory;
 import com.intellij.openapi.editor.EditorLinePainter;
 import com.intellij.openapi.editor.LineExtensionInfo;
@@ -58,9 +57,9 @@ public class CodeRemarkEditorLinePainter extends EditorLinePainter {
 
         final List<LineExtensionInfo> result = new ArrayList<>();
         final List<Integer> lines = CodeRemarkRepositoryFactory.getInstance().lines(file.getCanonicalPath());
-        if (lines.stream().anyMatch(line -> NumberUtil.equals(line, lineNumber))) {
+        if (lines.stream().anyMatch(line -> line == lineNumber)) {
             final String summary = CodeRemarkRepositoryFactory.getInstance().getSummary(file.getCanonicalPath(), lineNumber);
-            if (StrUtil.isNotEmpty(summary)) {
+            if (Utils.isNotEmpty(summary)) {
                 result.add(new LineExtensionInfo("// [MARK]: ",
                         new TextAttributes(JBColor.red, null, JBColor.red, EffectType.SEARCH_MATCH, Font.BOLD | Font.ITALIC)));
 
