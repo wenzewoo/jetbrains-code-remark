@@ -25,6 +25,8 @@
 package com.github.wenzewoo.jetbrains.plugin.coderemark.renderer;
 
 import com.github.wenzewoo.jetbrains.plugin.coderemark.Utils;
+import com.github.wenzewoo.jetbrains.plugin.coderemark.config.CodeRemarkConfig;
+import com.github.wenzewoo.jetbrains.plugin.coderemark.config.CodeRemarkConfigService;
 import com.github.wenzewoo.jetbrains.plugin.coderemark.repository.CodeRemarkRepositoryFactory;
 import com.intellij.openapi.editor.EditorLinePainter;
 import com.intellij.openapi.editor.LineExtensionInfo;
@@ -32,7 +34,6 @@ import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.ui.JBColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,13 +59,18 @@ public class CodeRemarkEditorLinePainter extends EditorLinePainter {
         final List<LineExtensionInfo> result = new ArrayList<>();
         final List<Integer> lines = CodeRemarkRepositoryFactory.getInstance().lines(file.getCanonicalPath());
         if (lines.stream().anyMatch(line -> line == lineNumber)) {
+            final CodeRemarkConfig config = CodeRemarkConfigService.getInstance().getState();
+
             final String summary = CodeRemarkRepositoryFactory.getInstance().getSummary(file.getCanonicalPath(), lineNumber);
             if (Utils.isNotEmpty(summary)) {
-                result.add(new LineExtensionInfo("// [MARK]: ",
-                        new TextAttributes(JBColor.red, null, JBColor.red, EffectType.SEARCH_MATCH, Font.BOLD | Font.ITALIC)));
-
+                if (Utils.isNotEmpty(config.getPrefix())) {
+                    final Color color = CodeRemarkConfig.asColor(config.getPrefixColor());
+                    result.add(new LineExtensionInfo(config.getPrefix(),
+                            new TextAttributes(color, null, color, EffectType.SEARCH_MATCH, Font.BOLD | Font.ITALIC)));
+                }
+                final Color color = CodeRemarkConfig.asColor(config.getBodyColor());
                 result.add(new LineExtensionInfo(summary,
-                        new TextAttributes(JBColor.red, null, JBColor.red, EffectType.BOXED, Font.ITALIC)));
+                        new TextAttributes(color, null, color, EffectType.BOXED, Font.ITALIC)));
 
                 rendererState.incrementLine(file.getCanonicalPath())
                         .appendPrevExtensionInfo(file.getCanonicalPath(), lineNumber, result);

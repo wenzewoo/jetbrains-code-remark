@@ -51,9 +51,14 @@
     <depends>com.intellij.modules.lang</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <applicationService
+                serviceImplementation="com.github.wenzewoo.jetbrains.plugin.coderemark.config.CodeRemarkConfigService"/>
+
+        <applicationConfigurable groupId="other"
+                                 instance="com.github.wenzewoo.jetbrains.plugin.coderemark.config.CodeRemarkConfigForm"/>
+
         <editor.linePainter
                 implementation="com.github.wenzewoo.jetbrains.plugin.coderemark.renderer.CodeRemarkEditorLinePainter"/>
-
 
         <intentionAction>
             <className>com.github.wenzewoo.jetbrains.plugin.coderemark.action.CrudIntentionAction$Add</className>

@@ -82,6 +82,12 @@ public class CodeRemarkRendererState {
         return this;
     }
 
+    public synchronized void resetAll() {
+        mStateMap.clear();
+        mLoadedLineCountMap.clear();
+        mPrevExtensionInfoMap.clear();
+    }
+
     public synchronized Boolean get(final String filePath) {
         return mStateMap.getOrDefault(filePath, false);
     }

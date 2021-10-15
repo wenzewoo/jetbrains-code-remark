@@ -43,8 +43,8 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 public class CrudIntentionAction {
 
@@ -254,21 +254,11 @@ public class CrudIntentionAction {
                 }
             });
 
-            editorPane.addKeyListener(new KeyListener() {
+            editorPane.addKeyListener(new KeyAdapter() {
                 @Override
                 public void keyReleased(final KeyEvent e) {
                     if (e.getKeyCode() == 27)  // Esc
                         balloon.hide();
-                }
-
-                @Override
-                public void keyTyped(final KeyEvent e) {
-                    // Skipped.
-                }
-
-                @Override
-                public void keyPressed(final KeyEvent e) {
-                    // Skipped.
                 }
             });
         }
