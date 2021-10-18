@@ -37,6 +37,7 @@ public class CodeRemarkConfigForm implements SearchableConfigurable, Configurabl
     public JComponent createComponent() {
         final CodeRemarkConfig state = CodeRemarkConfigService.getInstance().getState();
         textPrefix.setText(state.getPrefix());
+        lblPrefixColor.setText(textPrefix.getText());
         lblPrefixColor.setForeground(CodeRemarkConfig.asColor(state.getPrefixColor()));
         lblBodyColor.setForeground(CodeRemarkConfig.asColor(state.getBodyColor()));
         lblPrefixColor.setFont(
@@ -85,7 +86,15 @@ public class CodeRemarkConfigForm implements SearchableConfigurable, Configurabl
 
     @Override
     public boolean isModified() {
-        return true;
+        final CodeRemarkConfig state = CodeRemarkConfigService.getInstance().getState();
+
+        if (!state.getPrefix().equals(textPrefix.getText()))
+            return true;
+
+        if (!state.getBodyColor().equals(CodeRemarkConfig.byColor(lblBodyColor.getForeground())))
+            return true;
+
+        return !state.getPrefixColor().equals(CodeRemarkConfig.byColor(lblPrefixColor.getForeground()));
     }
 
     @Override
