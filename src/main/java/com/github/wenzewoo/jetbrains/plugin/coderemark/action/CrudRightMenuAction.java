@@ -26,67 +26,64 @@ package com.github.wenzewoo.jetbrains.plugin.coderemark.action;
 
 import com.github.wenzewoo.jetbrains.plugin.coderemark.Utils;
 import com.github.wenzewoo.jetbrains.plugin.coderemark.repository.CodeRemarkRepositoryFactory;
-import com.intellij.codeInsight.intention.impl.BaseIntentionAction;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
-import com.intellij.util.IncorrectOperationException;
-import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
-public class CrudIntentionAction {
+public class CrudRightMenuAction {
 
-    public abstract static class Base
-            extends BaseIntentionAction implements CrudAction {
+    public static abstract class Base
+            extends AnAction implements CrudAction {
 
         private Editor editor;
-
-        abstract String getName();
-
-        @Nls(capitalization = Nls.Capitalization.Sentence)
-        @NotNull
-        @Override
-        public String getText() {
-            return this.getName();
-        }
-
-        @Nls(capitalization = Nls.Capitalization.Sentence)
-        @NotNull
-        @Override
-        public String getFamilyName() {
-            return this.getName();
-        }
+        private PsiFile psiFile;
 
         @Override
-        public boolean startInWriteAction() {
-            return false;
+        public void update(@NotNull final AnActionEvent e) {
+            super.update(e);
+            this.initProperty(e);
+            if (null == this.editor) {
+                e.getPresentation().setEnabledAndVisible(false);
+                return;
+            }
+            if (null == this.psiFile) {
+                e.getPresentation().setEnabledAndVisible(false);
+                return;
+            }
+            e.getPresentation().setEnabledAndVisible(
+                    this.isAvailable(Utils.filePath(editor), Utils.lineNumber(editor))
+            );
         }
 
         @Override
-        public boolean isAvailable(@NotNull final Project project, final Editor editor, final PsiFile file) {
-            this.editor = editor;
-            return null != file && this.isAvailable(Utils.filePath(editor), Utils.lineNumber(editor));
+        public void actionPerformed(@NotNull final AnActionEvent e) {
+            this.initProperty(e); // To be on the safe side, init again?
+
+            if (null != this.editor && null != this.psiFile)
+                this.actionPerformed(Utils.filePath(editor), Utils.lineNumber(editor));
         }
 
-        @Override
-        public void invoke(@NotNull final Project project, final Editor editor, final PsiFile file)
-                throws IncorrectOperationException {
-            this.editor = editor;
-            this.actionPerformed(Utils.filePath(editor), Utils.lineNumber(editor));
+        void initProperty(final AnActionEvent e) {
+            this.editor = CommonDataKeys.EDITOR.getData(e.getDataContext());
+            this.psiFile = CommonDataKeys.PSI_FILE.getData(e.getDataContext());
         }
 
         @Override
         public Editor getEditor() {
             return editor;
         }
+
+        public PsiFile getPsiFile() {
+            return psiFile;
+        }
     }
 
-    public static class Add extends Base {
 
-        @Override
-        String getName() {
-            return "[MARK] Add remark";
-        }
+    @SuppressWarnings("ComponentNotRegistered")
+    public static class Add extends Base {
 
         @Override
         public boolean isAvailable(final String filePath, final int lineNumber) {
@@ -95,16 +92,13 @@ public class CrudIntentionAction {
 
         @Override
         public void actionPerformed(final String filePath, final int lineNumber) {
-            super.showEditorPopup("Add Remark", this.getEditor(), new CrudActionListener.Add());
+            this.showEditorPopup("Add Remark", this.getEditor(), new CrudActionListener.Add());
         }
     }
 
-    public static class Edit extends Base {
 
-        @Override
-        String getName() {
-            return "[MARK] Edit remark";
-        }
+    @SuppressWarnings("ComponentNotRegistered")
+    public static class Edit extends Base {
 
         @Override
         public boolean isAvailable(final String filePath, final int lineNumber) {
@@ -113,16 +107,29 @@ public class CrudIntentionAction {
 
         @Override
         public void actionPerformed(final String filePath, final int lineNumber) {
-            super.showEditorPopup("Edit Remark", this.getEditor(), new CrudActionListener.Edit());
+            this.showEditorPopup("Edit Remark", this.getEditor(), new CrudActionListener.Edit());
         }
     }
 
-    public static class Remove extends Base {
+
+    @SuppressWarnings("ComponentNotRegistered")
+    public static class Detail extends Base {
 
         @Override
-        String getName() {
-            return "[MARK] Remove remark";
+        public boolean isAvailable(final String filePath, final int lineNumber) {
+            final String summary = CodeRemarkRepositoryFactory.getInstance().getSummary(filePath, lineNumber);
+            return Utils.isNotEmpty(summary) && Utils.endsWith(summary, "..");
         }
+
+        @Override
+        public void actionPerformed(final String filePath, final int lineNumber) {
+            new CrudActionListener.Detail(this.getEditor()).handle(filePath, lineNumber);
+        }
+    }
+
+
+    @SuppressWarnings("ComponentNotRegistered")
+    public static class Remove extends Base {
 
         @Override
         public boolean isAvailable(final String filePath, final int lineNumber) {
@@ -135,12 +142,9 @@ public class CrudIntentionAction {
         }
     }
 
-    public static class RemoveAll extends Base {
 
-        @Override
-        String getName() {
-            return "[MARK] Remove remark with this file";
-        }
+    @SuppressWarnings("ComponentNotRegistered")
+    public static class RemoveAll extends Base {
 
         @Override
         public boolean isAvailable(final String filePath, final int lineNumber) {
@@ -150,24 +154,6 @@ public class CrudIntentionAction {
         @Override
         public void actionPerformed(final String filePath, final int lineNumber) {
             new CrudActionListener.RemoveAll(this.getEditor()).handle(filePath, lineNumber);
-        }
-    }
-
-    public static class Detail extends Base {
-        @Override
-        String getName() {
-            return "[MARK] Show detail";
-        }
-
-        @Override
-        public boolean isAvailable(final String filePath, final int lineNumber) {
-            final String summary = CodeRemarkRepositoryFactory.getInstance().getSummary(filePath, lineNumber);
-            return Utils.isNotEmpty(summary) && Utils.endsWith(summary, "..");
-        }
-
-        @Override
-        public void actionPerformed(final String filePath, final int lineNumber) {
-            new CrudActionListener.Detail(this.getEditor()).handle(filePath, lineNumber);
         }
     }
 }
