@@ -99,7 +99,7 @@
                     class="com.github.wenzewoo.jetbrains.plugin.coderemark.action.CrudRightMenuAction$Edit"/>
 
             <action id="CodeRemarkDetailMenuAction"
-                    text="Show detail"
+                    text="Show remark detail"
                     description="Show this line code remark detail"
                     class="com.github.wenzewoo.jetbrains.plugin.coderemark.action.CrudRightMenuAction$Detail"/>
 
@@ -109,7 +109,7 @@
                     class="com.github.wenzewoo.jetbrains.plugin.coderemark.action.CrudRightMenuAction$Remove"/>
 
             <action id="CodeRemarkRemoveAllMenuAction"
-                    text="Remove all remark"
+                    text="Remove remark with this file"
                     description="Remove this file code remark"
                     class="com.github.wenzewoo.jetbrains.plugin.coderemark.action.CrudRightMenuAction$RemoveAll"/>
         </group>
