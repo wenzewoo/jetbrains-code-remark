@@ -35,7 +35,6 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.JBPopupListener;
 import com.intellij.openapi.ui.popup.LightweightWindowEvent;
 import com.intellij.psi.PsiFile;
-import com.intellij.serviceContainer.NonInjectable;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.ui.JBDimension;
@@ -48,11 +47,9 @@ import java.awt.event.KeyEvent;
 
 public class CrudIntentionAction {
 
-    @NonInjectable
     public CrudIntentionAction() {
     }
 
-    @SuppressWarnings("IntentionDescriptionNotFoundInspection")
     public static class Add extends Base {
 
         @Override
@@ -75,7 +72,6 @@ public class CrudIntentionAction {
         }
     }
 
-    @SuppressWarnings("IntentionDescriptionNotFoundInspection")
     public static class Edit extends Base {
 
         @Override
@@ -98,7 +94,6 @@ public class CrudIntentionAction {
         }
     }
 
-    @SuppressWarnings("IntentionDescriptionNotFoundInspection")
     public static class Remove extends Base {
 
         @Override
@@ -123,7 +118,6 @@ public class CrudIntentionAction {
         }
     }
 
-    @SuppressWarnings("IntentionDescriptionNotFoundInspection")
     public static class RemoveAll extends Base {
 
         @Override
@@ -146,7 +140,6 @@ public class CrudIntentionAction {
         }
     }
 
-    @SuppressWarnings("IntentionDescriptionNotFoundInspection")
     public static class Detail extends Base {
         @Override
         String getName() {
