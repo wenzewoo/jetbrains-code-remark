@@ -156,7 +156,7 @@ public class CrudIntentionAction {
     public static class Detail extends Base {
         @Override
         String getName() {
-            return "[MARK] Show remark detail";
+            return "[MARK] Show detail";
         }
 
         @Override

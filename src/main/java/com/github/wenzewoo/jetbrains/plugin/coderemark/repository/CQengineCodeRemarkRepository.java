@@ -26,7 +26,6 @@ package com.github.wenzewoo.jetbrains.plugin.coderemark.repository;
 
 import com.github.wenzewoo.jetbrains.plugin.coderemark.Utils;
 import com.github.wenzewoo.jetbrains.plugin.coderemark.renderer.CodeRemarkRendererState;
-import com.google.common.collect.Lists;
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.attribute.Attribute;
@@ -37,10 +36,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.googlecode.cqengine.query.QueryFactory.*;
@@ -52,7 +48,7 @@ public class CQengineCodeRemarkRepository implements CodeRemarkRepository {
         try {
             Files.walk(SerializationUtils.SAVE_PATH).forEach(file -> {
                 final List<CodeRemark> codeRemarks = SerializationUtils.loadFromDisk(file.toFile());
-                if (null != codeRemarks && codeRemarks.size() > 0)
+                if (codeRemarks.size() > 0)
                     mCodeRemarks.addAll(codeRemarks); // First load, loading with local file.
             });
         } catch (final IOException e) {
@@ -95,13 +91,13 @@ public class CQengineCodeRemarkRepository implements CodeRemarkRepository {
 
         public static List<CodeRemark> loadFromDisk(final File file) {
             if (!file.exists())
-                return Lists.newArrayList();
+                return new ArrayList<>();
 
             try (final ObjectInputStream stream = new ObjectInputStream(
                     new FileInputStream(file))) {
                 return Arrays.asList((CodeRemark[]) stream.readObject());
             } catch (final Throwable e) {
-                return Lists.newArrayList();
+                return new ArrayList<>();
             }
         }
     }

@@ -99,7 +99,7 @@
                     class="com.github.wenzewoo.jetbrains.plugin.coderemark.action.CrudRightMenuAction$Edit"/>
 
             <action id="CodeRemarkDetailMenuAction"
-                    text="Show remark detail"
+                    text="Show detail"
                     description="Show this line code remark detail"
                     class="com.github.wenzewoo.jetbrains.plugin.coderemark.action.CrudRightMenuAction$Detail"/>
 
