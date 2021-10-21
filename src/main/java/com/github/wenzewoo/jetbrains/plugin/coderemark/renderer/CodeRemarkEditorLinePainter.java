@@ -28,11 +28,14 @@ import com.github.wenzewoo.jetbrains.plugin.coderemark.Utils;
 import com.github.wenzewoo.jetbrains.plugin.coderemark.config.CodeRemarkConfig;
 import com.github.wenzewoo.jetbrains.plugin.coderemark.config.CodeRemarkConfigService;
 import com.github.wenzewoo.jetbrains.plugin.coderemark.repository.CodeRemarkRepositoryFactory;
-import com.intellij.openapi.editor.EditorLinePainter;
-import com.intellij.openapi.editor.LineExtensionInfo;
+import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.openapi.editor.markup.TextAttributes;
+import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,15 +44,83 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CodeRemarkEditorLinePainter extends EditorLinePainter {
+    private final Map<String, CodeRemarkInlineRenderer> rendererSet = new ConcurrentHashMap<>();
+
+    private static int getIdentifierEndOffset(@NotNull CharSequence text, int startOffset) {
+        while (startOffset < text.length() && Character.isJavaIdentifierPart(text.charAt(startOffset))) startOffset++;
+        return startOffset;
+    }
 
     @Nullable
     @Override
     public Collection<LineExtensionInfo> getLineExtensions(
             @NotNull final Project project, @NotNull final VirtualFile file, final int lineNumber) {
+        CodeRemarkInlayListener.getInstance(project).startListening();
         final CodeRemarkRendererState rendererState = CodeRemarkRendererState.getInstance();
+        if (!rendererSet.containsKey(file.getCanonicalPath())) {
+            if (lineNumber == 10) {
+
+                FileEditor editor = FileEditorManager.getInstance(project).getSelectedEditor(file);
+                if (editor instanceof TextEditor) {
+                    Editor e = ((TextEditor) editor).getEditor();
+                    Document document = e.getDocument();
+                    CharSequence text = document.getImmutableCharSequence();
+                    int offset = document.getLineEndOffset(lineNumber);
+
+                    CodeRemarkInlineRenderer renderer = new CodeRemarkInlineRenderer("Supalle");
+                    rendererSet.put(file.getCanonicalPath(), renderer);
+//                    CodeRemarkInlineRenderer renderer = new CodeRemarkInlineRenderer("Supalle" + text);
+                    Inlay<CodeRemarkInlineRenderer> inlay = e.getInlayModel().addAfterLineEndElement(offset, false, renderer);
+                    Disposer.register(inlay, () -> {
+                    });
+//                int insertOffset = getIdentifierEndOffset(text, offset);
+//                e.getInlayModel().getInlineElementsInRange(insertOffset, insertOffset, XDebuggerInlayUtil.MyRenderer.class).forEach(Disposer::dispose);
+//                e.getInlayModel().addInlineElement(insertOffset, new XDebuggerInlayUtil.MyRenderer(inlayText));
+                }
+
+//                ApplicationManager.getApplication().invokeLater(() -> {
+//                    FileEditor editor = FileEditorManager.getInstance(project).getSelectedEditor(file);
+//                    if (editor instanceof TextEditor) {
+//                        Editor e = ((TextEditor) editor).getEditor();
+//                        Document document = e.getDocument();
+//                        CharSequence text = document.getImmutableCharSequence();
+//                        int offset = document.getLineEndOffset(lineNumber);
+//
+//                        CodeRemarkInlineRenderer renderer = new CodeRemarkInlineRenderer("Supalle");
+//                        rendererSet.put(file.getCanonicalPath(), renderer);
+////                    CodeRemarkInlineRenderer renderer = new CodeRemarkInlineRenderer("Supalle" + text);
+//                        Inlay<CodeRemarkInlineRenderer> inlay = e.getInlayModel().addAfterLineEndElement(offset, false, renderer);
+//                        Disposer.register(inlay, () -> {
+//                        });
+////                int insertOffset = getIdentifierEndOffset(text, offset);
+////                e.getInlayModel().getInlineElementsInRange(insertOffset, insertOffset, XDebuggerInlayUtil.MyRenderer.class).forEach(Disposer::dispose);
+////                e.getInlayModel().addInlineElement(insertOffset, new XDebuggerInlayUtil.MyRenderer(inlayText));
+//                    }
+//                });
+
+            }
+            //
+//            UIUtil.invokeLaterIfNeeded(() -> {
+//                FileEditor editor = FileEditorManager.getInstance(project).getSelectedEditor(file);
+//                if (editor instanceof TextEditor) {
+//                    Editor e = ((TextEditor) editor).getEditor();
+//                    Document document = e.getDocument();
+//                    CharSequence text = document.getImmutableCharSequence();
+//                    int offset = document.getLineEndOffset(lineNumber);
+//                    CodeRemarkInlineRenderer renderer = new CodeRemarkInlineRenderer("Supalle" + text);
+//                    Inlay<CodeRemarkInlineRenderer> inlay = e.getInlayModel().addAfterLineEndElement(offset, false, renderer);
+//                    Disposer.register(inlay, () -> {
+//                    });
+////                int insertOffset = getIdentifierEndOffset(text, offset);
+////                e.getInlayModel().getInlineElementsInRange(insertOffset, insertOffset, XDebuggerInlayUtil.MyRenderer.class).forEach(Disposer::dispose);
+////                e.getInlayModel().addInlineElement(insertOffset, new XDebuggerInlayUtil.MyRenderer(inlayText));
+//                }
+//            });
+        }
 
         if (rendererState.get(file.getCanonicalPath())) {
             // this file is loaded, skipped, show prev extension info.
@@ -81,4 +152,5 @@ public class CodeRemarkEditorLinePainter extends EditorLinePainter {
         }
         return result;
     }
+
 }
