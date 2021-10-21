@@ -24,7 +24,7 @@
 
 <!--suppress PluginXmlCapitalization -->
 <idea-plugin>
-    <id>com.github.wenzewoo.jetbrains.plugin.jetbrains-code-remark</id>
+    <id>com.github.wenzewoo.coderemark</id>
     <name>Code Remark</name>
     <vendor email="wenzewoo@gmail.com" url="https://github.com/wenzewoo">Wenze.Woo</vendor>
 
@@ -57,70 +57,19 @@
 
     <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
          on how to target different products -->
-    <idea-version since-build="193"/>
+    <idea-version since-build="203"/>
     <depends>com.intellij.modules.lang</depends>
 
+    <projectListeners>
+        <listener class="com.github.wenzewoo.coderemark.listener.MyFileEditorManagerListener"
+                  topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
+    </projectListeners>
+
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService
-                serviceImplementation="com.github.wenzewoo.jetbrains.plugin.coderemark.config.CodeRemarkConfigService"/>
 
-        <applicationConfigurable groupId="other"
-                                 instance="com.github.wenzewoo.jetbrains.plugin.coderemark.config.CodeRemarkConfigForm"/>
-
-        <editor.linePainter
-                implementation="com.github.wenzewoo.jetbrains.plugin.coderemark.renderer.CodeRemarkEditorLinePainter"/>
-
-        <intentionAction>
-            <className>com.github.wenzewoo.jetbrains.plugin.coderemark.action.CrudIntentionAction$Add</className>
-        </intentionAction>
-
-        <intentionAction>
-            <className>com.github.wenzewoo.jetbrains.plugin.coderemark.action.CrudIntentionAction$Edit</className>
-        </intentionAction>
-
-        <intentionAction>
-            <className>com.github.wenzewoo.jetbrains.plugin.coderemark.action.CrudIntentionAction$Remove</className>
-        </intentionAction>
-
-        <intentionAction>
-            <className>com.github.wenzewoo.jetbrains.plugin.coderemark.action.CrudIntentionAction$RemoveAll</className>
-        </intentionAction>
-
-        <intentionAction>
-            <className>com.github.wenzewoo.jetbrains.plugin.coderemark.action.CrudIntentionAction$Detail</className>
-        </intentionAction>
     </extensions>
 
     <actions>
-        <group id="CodeRemarkMenuGroup" popup="true" text="Code Remark">
-            <add-to-group group-id="EditorPopupMenu" anchor="before" relative-to-action="$Paste"/>
-            <add-to-group group-id="ToolsMenu" anchor="first"/>
 
-            <separator/>
-            <action id="CodeRemarkAddMenuAction"
-                    text="Add remark"
-                    description="Add new remark on the current line"
-                    class="com.github.wenzewoo.jetbrains.plugin.coderemark.action.CrudRightMenuAction$Add"/>
-
-            <action id="CodeRemarkEditMenuAction"
-                    text="Edit remark"
-                    description="Edit the line code remark"
-                    class="com.github.wenzewoo.jetbrains.plugin.coderemark.action.CrudRightMenuAction$Edit"/>
-
-            <action id="CodeRemarkDetailMenuAction"
-                    text="Show detail"
-                    description="Show this line code remark detail"
-                    class="com.github.wenzewoo.jetbrains.plugin.coderemark.action.CrudRightMenuAction$Detail"/>
-
-            <action id="CodeRemarkRemoveMenuAction"
-                    text="Remove remark"
-                    description="Remove this line code remark"
-                    class="com.github.wenzewoo.jetbrains.plugin.coderemark.action.CrudRightMenuAction$Remove"/>
-
-            <action id="CodeRemarkRemoveAllMenuAction"
-                    text="Remove remark with this file"
-                    description="Remove this file code remark"
-                    class="com.github.wenzewoo.jetbrains.plugin.coderemark.action.CrudRightMenuAction$RemoveAll"/>
-        </group>
     </actions>
 </idea-plugin>
