@@ -1,6 +1,12 @@
 package com.github.wenzewoo.coderemark.renderer
 
-import com.github.wenzewoo.coderemark.actions.RemoveAction
+import com.github.wenzewoo.coderemark.expand.clearCodeRemark
+import com.github.wenzewoo.coderemark.expand.lineNumber
+import com.github.wenzewoo.coderemark.expand.renderCodeRemark
+import com.github.wenzewoo.coderemark.utils.SwingUtils
+import com.intellij.icons.AllIcons
+import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.Constraints
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.impl.ActionToolbarImpl
@@ -16,15 +22,21 @@ import com.intellij.openapi.editor.impl.FontInfo
 import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.ui.components.JBScrollPane
-import com.intellij.util.ui.JBDimension
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.xdebugger.ui.DebuggerColors
 import java.awt.Cursor
+import java.awt.Font
 import java.awt.Graphics
 import java.awt.Rectangle
+import java.awt.event.KeyAdapter
+import java.awt.event.KeyEvent
 import javax.swing.BorderFactory
 import javax.swing.JEditorPane
+import javax.swing.JLabel
+import javax.swing.SwingConstants
+import javax.swing.border.CompoundBorder
+import javax.swing.border.EmptyBorder
 
 
 class CodeRemarkInlineRenderer(private var description: String) : EditorCustomElementRenderer {
@@ -42,6 +54,10 @@ class CodeRemarkInlineRenderer(private var description: String) : EditorCustomEl
             'a'.toInt(), attributes.fontType, fontPreferences,
             FontInfo.getFontRenderContext(editor.contentComponent)
         )
+    }
+
+    fun setDescription(description: String) {
+        this.description = description
     }
 
     override fun calcWidthInPixels(inlay: Inlay<*>): Int {
@@ -75,12 +91,26 @@ class CodeRemarkInlineRenderer(private var description: String) : EditorCustomEl
     }
 
     fun onClick(inlay: Inlay<*>, event: EditorMouseEvent) {
+        val editor = event.editor
+        val lineNumber = editor.lineNumber()
+
         val contentPanel = JBUI.Panels.simplePanel()
 
+        val headPanel = JBUI.Panels.simplePanel()
+        val lblTitle = JLabel("Edit remark: ${lineNumber + 1}", SwingConstants.CENTER)
+        lblTitle.font = Font(lblTitle.font.name, Font.BOLD, lblTitle.font.size)
+        lblTitle.border = CompoundBorder(lblTitle.border, EmptyBorder(5, 5, 5, 5))
+        headPanel.addToCenter(lblTitle)
+        headPanel.background = UIUtil.getToolTipActionBackground();
+        contentPanel.addToTop(headPanel);
+
         val editPane = JEditorPane()
-        editPane.preferredSize = JBDimension(300, 80)
+
+        editPane.preferredSize = SwingUtils.buildDimensionWithText(
+            this.description, editPane.font, 300, 600, 80, 120
+        )
         editPane.requestFocus()
-        editPane.border = BorderFactory.createEmptyBorder()
+        editPane.border = CompoundBorder(BorderFactory.createEmptyBorder(), EmptyBorder(5, 5, 5, 5))
         editPane.text = this.description
 
         val scrollPane = JBScrollPane(editPane)
@@ -88,21 +118,45 @@ class CodeRemarkInlineRenderer(private var description: String) : EditorCustomEl
 
         contentPanel.addToCenter(scrollPane)
 
-        val actionGroup = DefaultActionGroup()
-        actionGroup.add(RemoveAction(), Constraints.FIRST)
 
+        val actionGroup = DefaultActionGroup()
         val toolbar = ActionToolbarImpl("CodeRemarkInlineRenderer.Toolbar", actionGroup, true)
         toolbar.border = BorderFactory.createEmptyBorder()
         toolbar.background = UIUtil.getToolTipActionBackground()
         contentPanel.addToBottom(toolbar)
 
-        JBPopupFactory.getInstance()
+        val popup = JBPopupFactory.getInstance()
             .createComponentPopupBuilder(contentPanel, editPane)
-            .setResizable(false)
+            .setResizable(true)
             .setRequestFocus(true)
             .setMovable(false)
             .createPopup()
-            .showInBestPositionFor(event.editor)
+
+        actionGroup.add(object : AnAction("Save this remark?", null, AllIcons.Actions.Commit) {
+
+            override fun actionPerformed(e: AnActionEvent) {
+                editor.renderCodeRemark(lineNumber, editPane.text)
+                popup.dispose()
+            }
+        }, Constraints.FIRST)
+
+        actionGroup.add(object : AnAction("Remove this remark?", null, AllIcons.Actions.Cancel) {
+
+            override fun actionPerformed(e: AnActionEvent) {
+                editor.clearCodeRemark(lineNumber)
+                popup.dispose()
+            }
+        }, Constraints.LAST)
+
+        contentPanel.addKeyListener(object : KeyAdapter() {
+            override fun keyReleased(e: KeyEvent?) {
+                if (e?.keyCode == 27) {
+                    popup.dispose()
+                }
+            }
+        })
+
+        popup.showInBestPositionFor(event.editor)
     }
 
     fun onMouseExit(inlay: Inlay<*>, event: EditorMouseEvent) {

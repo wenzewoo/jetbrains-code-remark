@@ -7,15 +7,17 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.Inlay
 import com.intellij.openapi.editor.InlayModel
-import com.intellij.openapi.editor.event.*
+import com.intellij.openapi.editor.event.EditorMouseEvent
+import com.intellij.openapi.editor.event.EditorMouseEventArea
+import com.intellij.openapi.editor.event.EditorMouseListener
+import com.intellij.openapi.editor.event.EditorMouseMotionListener
 import com.intellij.openapi.project.Project
 import org.jetbrains.annotations.NotNull
 import java.awt.Point
 import java.awt.event.MouseEvent
 
 @Service
-class CodeRemarkInlayListener(private val project: Project) : EditorMouseMotionListener, EditorMouseListener,
-    Disposable {
+class CodeRemarkInlayListener : EditorMouseMotionListener, EditorMouseListener, Disposable {
 
     private var isListening = false
     private var lastHoveredInlay: Inlay<*>? = null
@@ -23,7 +25,7 @@ class CodeRemarkInlayListener(private val project: Project) : EditorMouseMotionL
     fun startListening() {
         if (!isListening) {
             isListening = true
-            val multicaster: EditorEventMulticaster = EditorFactory.getInstance().eventMulticaster
+            val multicaster = EditorFactory.getInstance().eventMulticaster
             multicaster.addEditorMouseMotionListener(this, this)
             multicaster.addEditorMouseListener(this, this)
         }

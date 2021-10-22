@@ -8,6 +8,8 @@ import com.intellij.openapi.vfs.VirtualFile
 class EditorManagerListener : FileEditorManagerListener {
 
     override fun fileOpened(source: FileEditorManager, file: VirtualFile) {
+        CodeRemarkInlayListener.getInstance(source.project).startListening()
+
         source.getSelectedEditor(file)?.let {
             it.renderCodeRemark(10, "你好世界")
             it.renderCodeRemark(12, "Hello World")

@@ -60,17 +60,15 @@
     <idea-version since-build="203"/>
     <depends>com.intellij.modules.lang</depends>
 
-    <applicationListeners>
-        <listener class="com.github.wenzewoo.coderemark.listener.ApplicationListener"
-                  topic="com.intellij.openapi.application.ApplicationActivationListener"/>
-    </applicationListeners>
     <projectListeners>
         <listener class="com.github.wenzewoo.coderemark.listener.EditorManagerListener"
                   topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
     </projectListeners>
 
     <extensions defaultExtensionNs="com.intellij">
-
+        <intentionAction>
+            <className>com.github.wenzewoo.coderemark.action.AddIntentionAction</className>
+        </intentionAction>
     </extensions>
 
     <actions>
