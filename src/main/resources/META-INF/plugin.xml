@@ -22,7 +22,7 @@
   ~ SOFTWARE.
   -->
 
-<!--suppress PluginXmlCapitalization -->
+<!--suppress PluginXmlCapitalization, PluginXmlValidity -->
 <idea-plugin>
     <id>com.github.wenzewoo.coderemark</id>
     <name>Code Remark</name>
@@ -60,8 +60,12 @@
     <idea-version since-build="203"/>
     <depends>com.intellij.modules.lang</depends>
 
+    <applicationListeners>
+        <listener class="com.github.wenzewoo.coderemark.listener.ApplicationListener"
+                  topic="com.intellij.openapi.application.ApplicationActivationListener"/>
+    </applicationListeners>
     <projectListeners>
-        <listener class="com.github.wenzewoo.coderemark.listener.MyFileEditorManagerListener"
+        <listener class="com.github.wenzewoo.coderemark.listener.EditorManagerListener"
                   topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
     </projectListeners>
 

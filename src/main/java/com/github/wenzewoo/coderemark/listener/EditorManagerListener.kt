@@ -1,17 +1,16 @@
 package com.github.wenzewoo.coderemark.listener
 
-import com.github.wenzewoo.coderemark.expand.getRelativePath
-import com.github.wenzewoo.coderemark.expand.versionHash
+import com.github.wenzewoo.coderemark.expand.renderCodeRemark
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.vfs.VirtualFile
 
-class MyFileEditorManagerListener : FileEditorManagerListener {
+class EditorManagerListener : FileEditorManagerListener {
 
     override fun fileOpened(source: FileEditorManager, file: VirtualFile) {
         source.getSelectedEditor(file)?.let {
-
-            println("fileOpened(), path=${file.getRelativePath(source.project)}, versionHash=${file.versionHash(source.project)} ")
+            it.renderCodeRemark(10, "你好世界")
+            it.renderCodeRemark(12, "Hello World")
         }
     }
 
