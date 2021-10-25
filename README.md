@@ -2,6 +2,7 @@
 
 > 一款Jetbrains系IDE代码备注插件，不同于代码注释，它可被应用于只读的源码文件，让你在阅读源码时如虎添翼。
 
+![](./screenshots/example.gif)
 ![](./screenshots/example.png)
 
 # 如何安装
@@ -12,14 +13,19 @@
 
 源码是只读文件，如何添加备注？使用该插件让你在阅读框架源码时如虎添翼。
 
-- 进入需要阅读的源码文件。
+- 将源码文件使用IDEA打开。
 
-- 在任何需要的地方，按下 `Alt + Enter` 快捷键（或通过右键菜单`Code Remark` )。
+- 在任何需要的地方，以下三种方式任选其一，触发Popup弹出层，添加内容。
 
-- 选择 `[MARK] Add remark`，输入备注信息，按下 `Esc` 按钮保存即可。
+    - `Alt` + `ENTER` ->  `[MARK] Add/Edit remark`
+    - `EditorPopupMenu` / `Tools` ->  `Add remark`
+    - `shift + R` [推荐]
 
-- 已经有备注的行，你依然可以继续按下 `Alt + Enter` 快捷键，选择对应的选项，进行编辑或者删除。
+# 快捷键
 
-- 此外，你可以通过 `Preferences` - `Other Settings` - `Code Remark` 配置代码备注的显示颜色。
+- 添加/编辑：<`shift` + `R`>
+- 保存：<`shift` + `ENTER`>
+- 删除：<`shift` + `DETELE`>
+- 取消：<`ESC`>
 
-- 你还可以通过 `Preferences` - `Keymap` 搜索 `Code Remark` ，为指定的操作配置相应的快捷键。
+> 可以通过 `Preferences` - `Keymap` 搜索 `Code Remark` ，为指定的操作配置相应的快捷键
