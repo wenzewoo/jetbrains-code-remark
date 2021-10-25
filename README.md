@@ -2,7 +2,6 @@
 
 > 一款Jetbrains系IDE代码备注插件，不同于代码注释，它可被应用于只读的源码文件，让你在阅读源码时如虎添翼。
 
-![](./screenshots/example.gif)
 ![](./screenshots/example.png)
 
 # 如何安装
