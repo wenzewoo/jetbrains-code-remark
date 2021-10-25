@@ -24,7 +24,7 @@
 
 <!--suppress PluginXmlCapitalization, PluginXmlValidity -->
 <idea-plugin>
-    <id>com.github.wenzewoo.coderemark</id>
+    <id>com.github.wenzewoo.jetbrains.plugin.jetbrains-code-remark</id>
     <name>Code Remark</name>
     <vendor email="wenzewoo@gmail.com" url="https://github.com/wenzewoo">Wenze.Woo</vendor>
 
