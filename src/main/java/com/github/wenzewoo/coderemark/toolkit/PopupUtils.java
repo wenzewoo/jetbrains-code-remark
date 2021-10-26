@@ -49,11 +49,11 @@ public class PopupUtils {
                 .createComponentPopupBuilder(component, focusComponent)
                 .setCancelKeyEnabled(true)
                 .setTitle(title)
-                .setModalContext(true)
                 .setCancelButton(new IconButton("Cancel?", AllIcons.Actions.Cancel))
                 .setResizable(true)
                 .setRequestFocus(true)
-                .setMovable(false)
+                .setCancelOnClickOutside(false)
+                .setMovable(true)
                 .createPopup();
     }
 
