@@ -24,6 +24,9 @@
 
 package com.github.wenzewoo.coderemark.toolkit;
 
+import com.intellij.openapi.util.text.StringUtil;
+import org.jetbrains.annotations.Nullable;
+
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -57,5 +60,9 @@ public class StringUtils {
             e.printStackTrace();
         }
         return input;
+    }
+
+    public static boolean equals(@Nullable final String val1, @Nullable final String val2) {
+        return StringUtil.equals(val1, val2);
     }
 }

@@ -54,9 +54,10 @@ public interface BaseToggleRemarkAction {
                 actions.add(new RemoveRemarkPopupToolbarAction());
             }
 
-            PopupUtils.showCodeRemarkEditor(editor,
+            PopupUtils.createCodeRemarkEditor(editor,
                     (null != codeRemark ? "Edit remark" : "Add remark"),
-                    null != codeRemark ? codeRemark.getText() : null, actions.toArray(new BasePopupToolbarAction[0]));
+                    null != codeRemark ? codeRemark.getText() : null, actions.toArray(new BasePopupToolbarAction[0]))
+                    .showInBestPositionFor(editor);
         }
     }
 }

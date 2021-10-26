@@ -46,7 +46,7 @@ public class SaveRemarkPopupToolbarAction extends BasePopupToolbarAction {
     }
 
     @Override
-    void actionPerformed(@NotNull final PopupActionEvent event) {
+    public void actionPerformed(@NotNull final PopupActionEvent event) {
         final String canonicalPath = EditorUtils.getCanonicalPath(event.editor);
 
         if (StringUtils.isNotEmpty(canonicalPath)) {

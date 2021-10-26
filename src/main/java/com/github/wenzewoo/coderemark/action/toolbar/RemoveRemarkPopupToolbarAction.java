@@ -45,7 +45,7 @@ public class RemoveRemarkPopupToolbarAction extends BasePopupToolbarAction {
     }
 
     @Override
-    void actionPerformed(@NotNull final PopupActionEvent event) {
+    public void actionPerformed(@NotNull final PopupActionEvent event) {
 
         PopupUtils.createConfirmation(getTemplateText(), () -> {
             final String canonicalPath = EditorUtils.getCanonicalPath(event.editor);

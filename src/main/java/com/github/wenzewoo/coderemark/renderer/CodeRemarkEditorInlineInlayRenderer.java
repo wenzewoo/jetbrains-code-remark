@@ -111,8 +111,9 @@ public class CodeRemarkEditorInlineInlayRenderer
     }
 
     public void onMouseClicked(@NotNull final Inlay inlay, @NotNull final EditorMouseEvent event) {
-        PopupUtils.showCodeRemarkEditor(event.getEditor(), "Edit remark", text,
-                new SaveRemarkPopupToolbarAction(), new RemoveRemarkPopupToolbarAction());
+        PopupUtils.createCodeRemarkEditor(event.getEditor(), "Edit remark", text,
+                new SaveRemarkPopupToolbarAction(), new RemoveRemarkPopupToolbarAction())
+                .showInBestPositionFor(event.getEditor());
     }
 
     public void onMouseMoved(@NotNull final Inlay inlay, @NotNull final EditorMouseEvent event) {
@@ -184,9 +185,9 @@ public class CodeRemarkEditorInlineInlayRenderer
 
     private static Font getFont(@NotNull final Editor editor) {
         final EditorColorsScheme colorsScheme = editor.getColorsScheme();
-        final TextAttributes attributes = editor.getColorsScheme().getAttributes(DebuggerColors.INLINED_VALUES);
-        final int fontStyle = attributes == null ? Font.PLAIN : attributes.getFontType();
-        return UIUtil.getFontWithFallback(colorsScheme.getEditorFontName(), fontStyle, colorsScheme.getEditorFontSize());
+        // final TextAttributes attributes = editor.getColorsScheme().getAttributes(DebuggerColors.INLINED_VALUES);
+        // final int fontStyle = attributes == null ? Font.PLAIN : attributes.getFontType();
+        return UIUtil.getFontWithFallback(colorsScheme.getEditorFontName(), Font.PLAIN, colorsScheme.getEditorFontSize());
     }
 
     private TextAttributes getAttributes(final Editor editor) {

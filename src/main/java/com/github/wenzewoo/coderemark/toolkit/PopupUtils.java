@@ -29,6 +29,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.impl.ActionToolbarImpl;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.ui.popup.IconButton;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -40,11 +41,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class PopupUtils {
 
     public static JBPopup createComponent(final String title, final JComponent component, final JComponent focusComponent) {
-
         return JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(component, focusComponent)
                 .setCancelKeyEnabled(true)
@@ -53,8 +54,7 @@ public class PopupUtils {
                 .setResizable(true)
                 .setRequestFocus(true)
                 .setCancelOnClickOutside(false)
-                .setMovable(true)
-                .createPopup();
+                .setMovable(true).createPopup();
     }
 
     public static JBPopup createMessage(@NotNull final String message, final Object... args) {
@@ -65,7 +65,8 @@ public class PopupUtils {
         return JBPopupFactory.getInstance().createConfirmation(title, onYes, 1);
     }
 
-    public static void showCodeRemarkEditor(
+
+    public static JBPopup createCodeRemarkEditor(
             @NotNull final Editor editor, final String title,
             @Nullable final String defaultVal, final BasePopupToolbarAction... actions) {
 
@@ -77,7 +78,10 @@ public class PopupUtils {
         final JEditorPane editorPane = new JEditorPane();
         editorPane.setBorder(JBUI.Borders.empty(5));
         editorPane.setPreferredSize(SwingUtils.createDimension(defaultVal, editorPane.getFont(), 300, 600, 80, 120));
+        final EditorColorsScheme colorsScheme = editor.getColorsScheme();
+        editorPane.setFont(UIUtil.getFontWithFallback(colorsScheme.getEditorFontName(), Font.PLAIN, colorsScheme.getEditorFontSize()));
         editorPane.setText(defaultVal);
+
         final JBScrollPane scrollPane = new JBScrollPane(editorPane);
         scrollPane.setBorder(JBUI.Borders.empty());
         layoutPanel.addToCenter(scrollPane);
@@ -96,6 +100,7 @@ public class PopupUtils {
             action.registerCustomShortcutSet();
             actionGroup.add(action);
         }
-        popup.showInBestPositionFor(editor);
+
+        return popup;
     }
 }
