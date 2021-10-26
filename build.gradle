@@ -26,6 +26,7 @@ intellij {
 }
 patchPluginXml {
     changeNotes = """
+      <li>2021-10-26: Change coderemark editor font</li> 
       <li>2021-10-25: UI refactoring</li> 
       <li>2021-10-20: Right click menu</li> 
       <li>2021-10-01: First version</li>"""
