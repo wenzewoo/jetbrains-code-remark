@@ -35,11 +35,11 @@ import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("IntentionDescriptionNotFoundInspection")
-public class ToggleRemarkIntentionRemarkAction extends BaseIntentionAction implements BaseToggleRemarkAction {
+public class ToggleRemarkIntentionAction extends BaseIntentionAction implements BaseToggleRemarkAction {
     @Override
     public @NotNull
     @IntentionFamilyName String getFamilyName() {
-        return ToggleRemarkIntentionRemarkAction.class.getName();
+        return ToggleRemarkIntentionAction.class.getName();
     }
 
     @Override
@@ -56,7 +56,7 @@ public class ToggleRemarkIntentionRemarkAction extends BaseIntentionAction imple
 
     @Override
     public boolean isAvailable(@NotNull final Project project, final Editor editor, final PsiFile file) {
-        return null != file && null != editor;
+        return null != file && null != editor && !file.isWritable();
     }
 
     @Override

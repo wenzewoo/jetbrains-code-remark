@@ -1,30 +1,36 @@
 # Jetbrains Code Remark
 
-> 一款Jetbrains系IDE代码备注插件，不同于代码注释，它可被应用于只读的源码文件，让你在阅读源码时如虎添翼。
+> A Jetbrains IDE code remark plug-in, different from code comments, it can be applied to read-only source files.
 
 ![](./screenshots/example.png)
 
-# 如何安装
+# HOW TO INSTALL
 
-在IDE插件市场搜索 `Code Remark` 或通过[releases](https://github.com/wenzewoo/jetbrains-code-remark/releases)下载安装包进行手动安装。
+Search for `Code Remark` in the IDE plug-in market or download the installation package
+via [releases](https://github.com/wenzewoo/jetbrains-code-remark/releases) and install it manually.
 
-# 使用说明
+# INSTRUCTIONS FOR USE
 
-源码是只读文件，如何添加备注？使用该插件让你在阅读框架源码时如虎添翼。
+The source code is a read-only file, how to add remarks?
 
-- 将源码文件使用IDEA打开。
+- Use IDEA to open the source code file (note: only read-only source code files are supported for the time being).
 
-- 在任何需要的地方，以下三种方式任选其一，触发Popup弹出层，添加内容。
+- Wherever you need it, you can choose one of the following three ways to trigger the Popup pop-up layer and add
+  content.
 
-    - `Alt` + `ENTER` ->  `[MARK] Add/Edit remark`
-    - `EditorPopupMenu` / `Tools` ->  `Add remark`
-    - `shift + R` [推荐]
+  - `Alt` + `ENTER` ->  `[MARK] Add/Edit remark`
+  - `EditorPopupMenu` / `Tools` ->  `Add remark`
+  - `shift + R` [RECOMMEND]
 
-# 快捷键
+- Use the right-click menu `Remark Navigation` in the editor to preview all the remarks added in the current file.
 
-- 添加/编辑：<`shift` + `R`>
-- 保存：<`shift` + `ENTER`>
-- 删除：<`shift` + `DETELE`>
-- 取消：<`ESC`>
+- In the `View` -> `Tool Windows` -> `Favorites` -> `Remarks` view, view all the remarks of the current project.
 
-> 可以通过 `Preferences` - `Keymap` 搜索 `Code Remark` ，为指定的操作配置相应的快捷键
+# HOT KEY
+
+- Add / Edit：<`shift` + `R`>
+- Saving：<`shift` + `ENTER`>
+- Delete：<`shift` + `DETELE`>
+- Cancel：<`ESC`>
+
+> You can search for `Code Remark` through `Preferences`-`Keymap`, and configure the corresponding shortcut keys for the specified operation

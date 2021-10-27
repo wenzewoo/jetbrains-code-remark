@@ -22,22 +22,21 @@
  * SOFTWARE.
  */
 
-package com.github.wenzewoo.coderemark.repository;
+package com.github.wenzewoo.coderemark.toolkit;
 
-import com.github.wenzewoo.coderemark.CodeRemark;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.io.IOException;
 
-public interface CodeRemarkRepository {
 
-    List<CodeRemark> list(@NotNull String projectName);
+public class VirtualFileUtils {
 
-    List<CodeRemark> list(@NotNull String projectName, @NotNull String fileName, @NotNull String contentHash);
-
-    CodeRemark get(@NotNull String projectName, @NotNull String fileName, @NotNull String contentHash, int lineNumber);
-
-    void save(CodeRemark codeRemark);
-
-    void remove(@NotNull String projectName, @NotNull String fileName, @NotNull String contentHash, int lineNumber);
+    public static String getContentHash(@NotNull final VirtualFile file) {
+        try {
+            return DigestUtils.hashMD5(file.contentsToByteArray(true));
+        } catch (final IOException e) {
+            throw new IllegalArgumentException("Get file content hash error, file is " + file.getCanonicalPath() + ", " + e.getMessage());
+        }
+    }
 }

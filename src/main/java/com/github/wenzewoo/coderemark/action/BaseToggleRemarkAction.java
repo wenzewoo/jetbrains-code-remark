@@ -24,40 +24,48 @@
 
 package com.github.wenzewoo.coderemark.action;
 
+import com.github.wenzewoo.coderemark.CodeRemark;
 import com.github.wenzewoo.coderemark.action.toolbar.BasePopupToolbarAction;
 import com.github.wenzewoo.coderemark.action.toolbar.RemoveRemarkPopupToolbarAction;
 import com.github.wenzewoo.coderemark.action.toolbar.SaveRemarkPopupToolbarAction;
-import com.github.wenzewoo.coderemark.repository.CodeRemark;
+import com.github.wenzewoo.coderemark.repository.CodeRemarkRepository;
 import com.github.wenzewoo.coderemark.repository.CodeRemarkRepositoryFactory;
 import com.github.wenzewoo.coderemark.toolkit.EditorUtils;
 import com.github.wenzewoo.coderemark.toolkit.PopupUtils;
-import com.github.wenzewoo.coderemark.toolkit.StringUtils;
+import com.github.wenzewoo.coderemark.toolkit.VirtualFileUtils;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public interface BaseToggleRemarkAction {
 
+    default CodeRemarkRepository getRepository() {
+        return CodeRemarkRepositoryFactory.getInstance();
+    }
+
+
     default void actionPerformed(final Editor editor) {
         if (null == editor) return;
 
+        final Project project = editor.getProject();
         final int lineNumber = EditorUtils.getLineNumber(editor);
-        final String canonicalPath = EditorUtils.getCanonicalPath(editor);
+        final VirtualFile file = EditorUtils.getVirtualFile(editor);
 
-        if (StringUtils.isNotEmpty(canonicalPath)) {
-            final CodeRemark codeRemark = CodeRemarkRepositoryFactory.getInstance().get(canonicalPath, lineNumber);
+        if (null != file && null != project) {
+            final CodeRemark codeRemark = getRepository().get(
+                    project.getName(), file.getName(), VirtualFileUtils.getContentHash(file), lineNumber);
 
             final List<BasePopupToolbarAction> actions = new ArrayList<>();
             actions.add(new SaveRemarkPopupToolbarAction());
-            if (null != codeRemark) {
+            if (null != codeRemark)
                 actions.add(new RemoveRemarkPopupToolbarAction());
-            }
-
-            PopupUtils.createCodeRemarkEditor(editor,
-                    (null != codeRemark ? "Edit remark" : "Add remark"),
-                    null != codeRemark ? codeRemark.getText() : null, actions.toArray(new BasePopupToolbarAction[0]))
-                    .showInBestPositionFor(editor);
+            final String title = (null != codeRemark ? "Edit remark" : "Add remark");
+            final String defaultVal = (null != codeRemark ? codeRemark.getText() : null);
+            PopupUtils.createCodeRemarkEditor(editor, file, title, defaultVal,
+                    actions.toArray(new BasePopupToolbarAction[0])).showInBestPositionFor(editor);
         }
     }
 }

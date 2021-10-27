@@ -25,8 +25,6 @@
 package com.github.wenzewoo.coderemark.action.toolbar;
 
 import com.github.wenzewoo.coderemark.exception.UiIllegalArgumentException;
-import com.github.wenzewoo.coderemark.repository.CodeRemark;
-import com.github.wenzewoo.coderemark.repository.CodeRemarkRepositoryFactory;
 import com.github.wenzewoo.coderemark.toolkit.EditorUtils;
 import com.github.wenzewoo.coderemark.toolkit.StringUtils;
 import com.intellij.icons.AllIcons;
@@ -47,17 +45,12 @@ public class SaveRemarkPopupToolbarAction extends BasePopupToolbarAction {
 
     @Override
     public void actionPerformed(@NotNull final PopupActionEvent event) {
-        final String canonicalPath = EditorUtils.getCanonicalPath(event.editor);
+        final String text = event.getEditorPane().getText();
+        if (StringUtils.isEmpty(text))
+            throw new UiIllegalArgumentException("Please enter the content");
 
-        if (StringUtils.isNotEmpty(canonicalPath)) {
-            final String text = event.editorPane.getText();
-            if (StringUtils.isEmpty(text))
-                throw new UiIllegalArgumentException("Please enter the content");
-
-            EditorUtils.addAfterLineCodeRemark(event.editor, event.lineNumber, text);
-            CodeRemarkRepositoryFactory.getInstance().save(
-                    new CodeRemark(event.lineNumber, canonicalPath, text));
-        }
+        EditorUtils.addAfterLineCodeRemark(event.getEditor(), event.getLineNumber(), text);
+        getPublisher().codeRemarkChanged(event.getProject(), event.getFile(), event.getLineNumber(), text);
         super.dispose();
     }
 }

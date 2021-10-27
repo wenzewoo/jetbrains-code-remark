@@ -37,7 +37,7 @@
 
     <p>A Jetbrains IDE code remark plug-in, it can be applied to read-only source code files.</p>
     <ol>
-        <li>Open the source code file with IDEA.</li>
+        <li>Open the source code file with IDEA. <em>(Note: For the time being, only read-only source code files are supported)</em></li>
         <li>
             Wherever you need it, choose one of the following three ways to trigger the Popup pop-up layer and add content
             <ol>
@@ -46,14 +46,17 @@
                 <li><b>shift + R</b> [RECOMMEND]</li>
             </ol>
         </li>
+        <li>In the editor, use the right-click menu <b>Remark Navigation</b> to preview all the remarks added in the current file.</li>
+        <li>View all the remarks of the current project in the <b>View</b> -> <b>Tool Windows</b> -> <b>Favorites</b> -> <b>Remarks</b> view.</li>
     </ol>
+
 
     <br/>
     <img src="https://cdn.jsdelivr.net/gh/wenzewoo/jetbrains-code-remark/screenshots/example.png"/>
     <br/>
     <p>一款Jetbrains系IDE代码备注插件，不同于代码注释，它可被应用于只读的源码文件，让你在阅读源码时如虎添翼。</p>
     <ol>
-        <li>将源码文件使用IDEA打开。</li>
+        <li>将源码文件使用IDEA打开。<em>（注意：暂时仅支持只读的源码文件）</em></li>
         <li>
             在任何需要的地方，以下三种方式任选其一，触发Popup弹出层，添加内容。
             <ol>
@@ -62,6 +65,8 @@
                 <li><b>shift + R</b> [推荐]</li>
             </ol>
         </li>
+        <li>在编辑器中使用右键菜单 <b>Remark Navigation</b> 预览当前文件添加的所有备注信息。</li>
+        <li>在<b>View</b> -> <b>Tool Windows</b> -> <b>Favorites</b> -> <b>Remarks</b> 视图中查看当前项目所有的备注信息。</li>
     </ol>
     ]]>
 
@@ -83,15 +88,24 @@
                 serviceImplementation="com.github.wenzewoo.coderemark.listener.CodeRemarkEditorInlineInlayListener"/>
 
         <intentionAction>
-            <className>com.github.wenzewoo.coderemark.action.intention.ToggleRemarkIntentionRemarkAction</className>
+            <className>com.github.wenzewoo.coderemark.action.intention.ToggleRemarkIntentionAction</className>
         </intentionAction>
+
+        <favoritesListProvider
+                implementation="com.github.wenzewoo.coderemark.treeView.CodeRemarkFavoriteListProvider"/>
     </extensions>
 
     <actions>
+        <action text="Remark Navigation"
+                id="com.github.wenzewoo.coderemark.action.menu.RemarkNavigationMenuAction"
+                class="com.github.wenzewoo.coderemark.action.menu.RemarkNavigationMenuAction">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+        </action>
+
         <action text="Toggle Remark"
                 icon="general/balloonInformation.svg"
-                id="com.github.wenzewoo.coderemark.action.menu.ToggleRemarkMenuRemarkAction"
-                class="com.github.wenzewoo.coderemark.action.menu.ToggleRemarkMenuRemarkAction">
+                id="com.github.wenzewoo.coderemark.action.menu.ToggleRemarkMenuAction"
+                class="com.github.wenzewoo.coderemark.action.menu.ToggleRemarkMenuAction">
             <keyboard-shortcut keymap="$default" first-keystroke="shift R"/>
             <add-to-group group-id="ToolsMenu" anchor="first"/>
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>

@@ -27,9 +27,6 @@ package com.github.wenzewoo.coderemark.toolkit;
 import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.Nullable;
 
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 
 public class StringUtils {
@@ -46,23 +43,15 @@ public class StringUtils {
         return MessageFormat.format(text, args);
     }
 
-    public static String hashMD5(final String input) {
-        if (input == null || input.length() == 0) return null;
-        try {
-            final MessageDigest md5 = MessageDigest.getInstance("MD5");
-            md5.update(input.getBytes());
-            final byte[] byteArray = md5.digest();
-            final BigInteger bigInt = new BigInteger(1, byteArray);
-            final StringBuilder result = new StringBuilder(bigInt.toString(16));
-            while (result.length() < 32) result.insert(0, "0");
-            return result.toString().toUpperCase();
-        } catch (final NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return input;
-    }
-
     public static boolean equals(@Nullable final String val1, @Nullable final String val2) {
         return StringUtil.equals(val1, val2);
+    }
+
+    public static String maxLength(@Nullable final String val, final int maxLength) {
+        if (isEmpty(val)) return val;
+
+        if (val.length() > maxLength)
+            return val.substring(0, maxLength - 1) + "...";
+        return val;
     }
 }

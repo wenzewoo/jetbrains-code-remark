@@ -31,19 +31,12 @@ import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class EditorUtils {
 
-    @Nullable
-    public static String getCanonicalPath(@NotNull final Editor editor) {
-        if (editor instanceof EditorEx) {
-
-            final VirtualFile virtualFile = ((EditorEx) editor).getVirtualFile();
-            if (null == virtualFile) return null;
-
-            return virtualFile.getCanonicalPath();
-        }
+    public static VirtualFile getVirtualFile(@NotNull final Editor editor) {
+        if (editor instanceof EditorEx)
+            return ((EditorEx) editor).getVirtualFile();
         return null;
     }
 

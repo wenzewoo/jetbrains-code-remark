@@ -22,50 +22,25 @@
  * SOFTWARE.
  */
 
-package com.github.wenzewoo.coderemark.repository;
+package com.github.wenzewoo.coderemark.toolkit;
 
-import java.io.Serializable;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
-public class CodeRemark implements Serializable {
+public class DigestUtils {
 
-    private static final long serialVersionUID = 5906557169110070235L;
-    private int lineNumber;
-    private String filePath;
-    private String text;
-
-    public CodeRemark() {
-    }
-
-    public CodeRemark(final int lineNumber, final String filePath, final String text) {
-        this.lineNumber = lineNumber;
-        this.filePath = filePath;
-        this.text = text;
-    }
-
-    public int getLineNumber() {
-        return lineNumber;
-    }
-
-    public CodeRemark setLineNumber(final int lineNumber) {
-        this.lineNumber = lineNumber;
-        return this;
-    }
-
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public CodeRemark setFilePath(final String filePath) {
-        this.filePath = filePath;
-        return this;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public CodeRemark setText(final String text) {
-        this.text = text;
-        return this;
+    public static String hashMD5(final byte[] bytes) {
+        try {
+            final MessageDigest md5 = MessageDigest.getInstance("MD5");
+            md5.update(bytes);
+            final byte[] byteArray = md5.digest();
+            final BigInteger bigInt = new BigInteger(1, byteArray);
+            final StringBuilder result = new StringBuilder(bigInt.toString(16));
+            while (result.length() < 32) result.insert(0, "0");
+            return result.toString().toUpperCase();
+        } catch (final NoSuchAlgorithmException e) {
+            throw new IllegalArgumentException("Failed to generate MD5 digest: " + e.getMessage());
+        }
     }
 }

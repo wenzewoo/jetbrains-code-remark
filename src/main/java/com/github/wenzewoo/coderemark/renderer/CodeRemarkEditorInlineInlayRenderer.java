@@ -24,8 +24,10 @@
 
 package com.github.wenzewoo.coderemark.renderer;
 
+import com.github.wenzewoo.coderemark.CodeRemark;
 import com.github.wenzewoo.coderemark.action.toolbar.RemoveRemarkPopupToolbarAction;
 import com.github.wenzewoo.coderemark.action.toolbar.SaveRemarkPopupToolbarAction;
+import com.github.wenzewoo.coderemark.toolkit.EditorUtils;
 import com.github.wenzewoo.coderemark.toolkit.PopupUtils;
 import com.github.wenzewoo.coderemark.toolkit.StringUtils;
 import com.intellij.icons.AllIcons;
@@ -39,6 +41,7 @@ import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.openapi.editor.impl.FontInfo;
 import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.openapi.editor.markup.TextAttributes;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.paint.EffectPainter;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.xdebugger.ui.DebuggerColors;
@@ -53,7 +56,6 @@ public class CodeRemarkEditorInlineInlayRenderer
         implements EditorCustomElementRenderer {
 
     private final static int RENDERER_TEXT_MAX_LENGTH = 20;
-    private final static Icon PREFIX_ICON = AllIcons.General.BalloonInformation;
     private final static Icon HOVERED_SUFFIX_ICON = AllIcons.General.LinkDropTriangle;
 
 
@@ -71,7 +73,7 @@ public class CodeRemarkEditorInlineInlayRenderer
         final Editor editor = inlay.getEditor();
         final Font font = getFont(editor);
         final FontMetrics metrics = getFontMetrics(font, editor);
-        return metrics.stringWidth(getPreviewText()) + PREFIX_ICON.getIconWidth() + (isHovered ? HOVERED_SUFFIX_ICON.getIconWidth() : 0);
+        return metrics.stringWidth(getPreviewText()) + CodeRemark.getIcon().getIconWidth() + (isHovered ? HOVERED_SUFFIX_ICON.getIconWidth() : 0);
     }
 
 
@@ -93,8 +95,9 @@ public class CodeRemarkEditorInlineInlayRenderer
 
         // draw icon
         // curX += (2 * margin);
-        PREFIX_ICON.paintIcon(inlay.getEditor().getComponent(), graphics, curX, getIconY(PREFIX_ICON, rectangle));
-        curX += PREFIX_ICON.getIconWidth() + margin * 2;
+        final Icon prefixIcon = CodeRemark.getIcon();
+        prefixIcon.paintIcon(inlay.getEditor().getComponent(), graphics, curX, getIconY(prefixIcon, rectangle));
+        curX += prefixIcon.getIconWidth() + margin * 2;
 
         // draw text
         final String previewText = getPreviewText();
@@ -111,9 +114,11 @@ public class CodeRemarkEditorInlineInlayRenderer
     }
 
     public void onMouseClicked(@NotNull final Inlay inlay, @NotNull final EditorMouseEvent event) {
-        PopupUtils.createCodeRemarkEditor(event.getEditor(), "Edit remark", text,
-                new SaveRemarkPopupToolbarAction(), new RemoveRemarkPopupToolbarAction())
-                .showInBestPositionFor(event.getEditor());
+        final VirtualFile file = EditorUtils.getVirtualFile(event.getEditor());
+        if (null != file) {
+            PopupUtils.createCodeRemarkEditor(event.getEditor(), file, "Edit remark", text,
+                    new SaveRemarkPopupToolbarAction(), new RemoveRemarkPopupToolbarAction()).showInBestPositionFor(event.getEditor());
+        }
     }
 
     public void onMouseMoved(@NotNull final Inlay inlay, @NotNull final EditorMouseEvent event) {
@@ -139,11 +144,7 @@ public class CodeRemarkEditorInlineInlayRenderer
 
 
     private String getPreviewText() {
-        String previewText = text;
-        if (previewText.length() > RENDERER_TEXT_MAX_LENGTH)
-            previewText = previewText.substring(0, RENDERER_TEXT_MAX_LENGTH) + "...";
-
-        return previewText;
+        return StringUtils.maxLength(text, RENDERER_TEXT_MAX_LENGTH);
     }
 
     private static void paintEffects(@NotNull final Graphics g,

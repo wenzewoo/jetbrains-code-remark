@@ -24,37 +24,46 @@
 
 package com.github.wenzewoo.coderemark.action.menu;
 
+import com.github.wenzewoo.coderemark.CodeRemark;
 import com.github.wenzewoo.coderemark.action.BaseToggleRemarkAction;
-import com.github.wenzewoo.coderemark.repository.CodeRemarkRepositoryFactory;
 import com.github.wenzewoo.coderemark.toolkit.EditorUtils;
-import com.github.wenzewoo.coderemark.toolkit.StringUtils;
+import com.github.wenzewoo.coderemark.toolkit.VirtualFileUtils;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("ComponentNotRegistered")
-public class ToggleRemarkMenuRemarkAction extends AnAction implements BaseToggleRemarkAction {
+public class ToggleRemarkMenuAction extends AnAction implements BaseToggleRemarkAction {
 
     @Override
     public void update(@NotNull final AnActionEvent e) {
         super.update(e);
+
+        final Project project = CommonDataKeys.PROJECT.getData(e.getDataContext());
+        if (null == project) {
+            e.getPresentation().setEnabledAndVisible(false);
+            return;
+        }
 
         final Editor editor = CommonDataKeys.EDITOR.getData(e.getDataContext());
         if (null == editor) {
             e.getPresentation().setEnabledAndVisible(false);
             return;
         }
-        final int lineNumber = EditorUtils.getLineNumber(editor);
-        final String canonicalPath = EditorUtils.getCanonicalPath(editor);
 
-        if (StringUtils.isEmpty(canonicalPath)) {
+        final VirtualFile file = CommonDataKeys.VIRTUAL_FILE.getData(e.getDataContext());
+        if (null == file || file.isWritable()) {
             e.getPresentation().setEnabledAndVisible(false);
             return;
         }
-        final boolean exists = CodeRemarkRepositoryFactory.getInstance().exists(canonicalPath, lineNumber);
-        e.getPresentation().setText((exists ? "Edit remark: " : "Add remark: ") + (lineNumber + 1));
+        final int lineNumber = EditorUtils.getLineNumber(editor);
+        final CodeRemark codeRemark = getRepository().get(
+                project.getName(), file.getName(), VirtualFileUtils.getContentHash(file), lineNumber);
+        e.getPresentation().setText((null != codeRemark ? "Edit Remark" : "Add Remark"));
     }
 
     @Override

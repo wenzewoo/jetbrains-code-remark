@@ -33,6 +33,7 @@ import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.ui.popup.IconButton;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
@@ -67,7 +68,7 @@ public class PopupUtils {
 
 
     public static JBPopup createCodeRemarkEditor(
-            @NotNull final Editor editor, final String title,
+            @NotNull final Editor editor, final VirtualFile file, final String title,
             @Nullable final String defaultVal, final BasePopupToolbarAction... actions) {
 
         final int lineNumber = EditorUtils.getLineNumber(editor);
@@ -96,7 +97,7 @@ public class PopupUtils {
         // create popup
         final JBPopup popup = PopupUtils.createComponent(title + ": " + (lineNumber + 1), layoutPanel, editorPane);
         for (final BasePopupToolbarAction action : actions) {
-            action.setEvent(new BasePopupToolbarAction.PopupActionEvent(popup, editor, editorPane, lineNumber));
+            action.setEvent(new BasePopupToolbarAction.PopupActionEvent(popup, editor, file, editorPane, lineNumber));
             action.registerCustomShortcutSet();
             actionGroup.add(action);
         }
