@@ -2,6 +2,8 @@
 
 > A Jetbrains IDE code remark plug-in, different from code comments, it can be applied to read-only source files.
 
+[中文](./README_CN.md) | [Report Issues](https://github.com/wenzewoo/jetbrains-code-remark/issues)
+
 ![](./screenshots/example.png)
 
 # HOW TO INSTALL
