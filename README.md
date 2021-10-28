@@ -36,4 +36,4 @@ The source code is a read-only file, how to add remarks?
 - Delete：<`shift` + `DETELE`>
 - Cancel：<`ESC`>
 
-> You can search for `Code Remark` through `Preferences`-`Keymap`, and configure the corresponding shortcut keys for the specified operation
+> You can search for `remark` through `Preferences`-`Keymap`, and configure the corresponding shortcut keys for the specified operation

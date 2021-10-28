@@ -34,4 +34,4 @@
 - 删除：<`shift` + `DETELE`>
 - 取消：<`ESC`>
 
-> 可以通过 `Preferences` - `Keymap` 搜索 `Code Remark` ，为指定的操作配置相应的快捷键
+> 可以通过 `Preferences` - `Keymap` 搜索 `remark` ，为指定的操作配置相应的快捷键
