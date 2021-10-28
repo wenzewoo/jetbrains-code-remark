@@ -26,6 +26,7 @@ package com.github.wenzewoo.coderemark.treeView;
 
 import com.github.wenzewoo.coderemark.CodeRemark;
 import com.github.wenzewoo.coderemark.listener.CodeRemarkListener;
+import com.github.wenzewoo.coderemark.repository.CodeRemarkRepositoryFactory;
 import com.github.wenzewoo.coderemark.toolkit.StringUtils;
 import com.intellij.ide.favoritesTreeView.AbstractFavoritesListProvider;
 import com.intellij.ide.favoritesTreeView.FavoritesManager;
@@ -53,7 +54,7 @@ public class CodeRemarkFavoriteListProvider extends AbstractFavoritesListProvide
         if (myProject.isDisposed()) return;
         myChildren.clear();
 
-        final List<CodeRemark> codeRemarks = getRepository().list(myProject.getName());
+        final List<CodeRemark> codeRemarks = CodeRemarkRepositoryFactory.getInstance().list(myProject);
         for (final CodeRemark codeRemark : codeRemarks) {
 
             final AbstractTreeNode<CodeRemark> treeNode = new AbstractTreeNode<>(myProject, codeRemark) {
@@ -104,12 +105,7 @@ public class CodeRemarkFavoriteListProvider extends AbstractFavoritesListProvide
     }
 
     @Override
-    public void codeRemarkRemoved(@NotNull final Project project, @NotNull final VirtualFile file, final int lineNumber) {
-        updateChildren();
-    }
-
-    @Override
-    public void codeRemarkChanged(@NotNull final Project project, @NotNull final VirtualFile file, final int lineNumber, final String text) {
+    public void codeRemarkChanged(@NotNull final Project project, @NotNull final VirtualFile file) {
         updateChildren();
     }
 

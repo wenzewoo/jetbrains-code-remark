@@ -27,12 +27,11 @@ package com.github.wenzewoo.coderemark.action.menu;
 import com.github.wenzewoo.coderemark.CodeRemark;
 import com.github.wenzewoo.coderemark.repository.CodeRemarkRepositoryFactory;
 import com.github.wenzewoo.coderemark.toolkit.StringUtils;
-import com.github.wenzewoo.coderemark.toolkit.VirtualFileUtils;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.*;
 import com.intellij.openapi.util.NlsContexts;
@@ -61,8 +60,10 @@ public class RemarkNavigationMenuAction extends AnAction {
             final String title = StringUtils.format("{0} remarks",
                     codeRemarks.get(0).getFileName());
 
+            final Project project = CommonDataKeys.PROJECT.getData(e.getDataContext());
+            final Editor editor = CommonDataKeys.EDITOR.getData(e.getDataContext());
             final ListPopupStep<CodeRemark> listPopupStep =
-                    new CodeRemarkNavigationListPopupStep(title, e.getDataContext(), codeRemarks);
+                    new CodeRemarkNavigationListPopupStep(title, project, editor, codeRemarks);
             JBPopupFactory.getInstance().createListPopup(listPopupStep).showInFocusCenter();
         }
     }
@@ -72,24 +73,26 @@ public class RemarkNavigationMenuAction extends AnAction {
         final Editor editor = CommonDataKeys.EDITOR.getData(e.getDataContext());
         final VirtualFile file = CommonDataKeys.VIRTUAL_FILE.getData(e.getDataContext());
 
-        if (null == project || null == editor || null == file || file.isWritable())
+        if (null == project || null == editor || null == file)
             return Collections.emptyList();
 
-        return CodeRemarkRepositoryFactory.getInstance().list(
-                project.getName(), file.getName(), VirtualFileUtils.getContentHash(file));
+        return CodeRemarkRepositoryFactory.getInstance().list(project, file);
     }
 
     static class CodeRemarkNavigationListPopupStep implements ListPopupStep<CodeRemark> {
 
         private final String title;
-        private final DataContext context;
+        private final Project project;
+        private final Editor editor;
         private final List<CodeRemark> codeRemarks;
 
-        public CodeRemarkNavigationListPopupStep(final String title, final DataContext context, final List<CodeRemark> codeRemarks) {
+        CodeRemarkNavigationListPopupStep(final String title, final Project project, final Editor editor, final List<CodeRemark> codeRemarks) {
             this.title = title;
-            this.context = context;
+            this.project = project;
+            this.editor = editor;
             this.codeRemarks = codeRemarks;
         }
+
 
         @Override
         public @NotNull
@@ -112,7 +115,8 @@ public class RemarkNavigationMenuAction extends AnAction {
         public @NlsContexts.ListItem
         @NotNull
         String getTextFor(final CodeRemark value) {
-            return StringUtils.format("[Line:{0}] {1}", value.getLineNumber() + 1, value.getText());
+            final String text = StringUtils.maxLength(value.getText(), 100);
+            return StringUtils.format("[Line:{0}] {1}", value.getLineNumber() + 1, text);
         }
 
         @Override
@@ -136,10 +140,11 @@ public class RemarkNavigationMenuAction extends AnAction {
         @Override
         public @Nullable
         PopupStep<?> onChosen(final CodeRemark selectedValue, final boolean finalChoice) {
-            final Editor editor = CommonDataKeys.EDITOR.getData(context);
-            final Project project = CommonDataKeys.PROJECT.getData(context);
             if (null != editor) {
-                selectedValue.getTarget(project).navigateIn(editor);
+                final OpenFileDescriptor target = selectedValue.getTarget(project);
+
+                if (null != target)
+                    target.navigateIn(editor);
             }
             return null;
         }

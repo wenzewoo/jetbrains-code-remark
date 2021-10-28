@@ -32,7 +32,6 @@ import com.github.wenzewoo.coderemark.repository.CodeRemarkRepository;
 import com.github.wenzewoo.coderemark.repository.CodeRemarkRepositoryFactory;
 import com.github.wenzewoo.coderemark.toolkit.EditorUtils;
 import com.github.wenzewoo.coderemark.toolkit.PopupUtils;
-import com.github.wenzewoo.coderemark.toolkit.VirtualFileUtils;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -55,8 +54,7 @@ public interface BaseToggleRemarkAction {
         final VirtualFile file = EditorUtils.getVirtualFile(editor);
 
         if (null != file && null != project) {
-            final CodeRemark codeRemark = getRepository().get(
-                    project.getName(), file.getName(), VirtualFileUtils.getContentHash(file), lineNumber);
+            final CodeRemark codeRemark = getRepository().get(project, file, lineNumber);
 
             final List<BasePopupToolbarAction> actions = new ArrayList<>();
             actions.add(new SaveRemarkPopupToolbarAction());

@@ -35,32 +35,39 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class CodeRemarkSerializableRepositoryWrapper implements CodeRemarkRepository {
+public class CodeRemarkCQengineSerializableWrapper implements CodeRemarkRepository {
     private final static Path mBasePath = Paths.get(System.getProperty("user.home"), ".code-remark");
 
     private boolean initialized = false;
     private final CodeRemarkCQengineRepository delegate;
 
-    public CodeRemarkSerializableRepositoryWrapper(final CodeRemarkCQengineRepository delegate) {
+    public CodeRemarkCQengineSerializableWrapper(final CodeRemarkCQengineRepository delegate) {
         this.delegate = delegate;
     }
 
     @Override
     public List<CodeRemark> list(@NotNull final String projectName) {
-        initialize(projectName);
+        initializeFromDisk(projectName);
         return delegate.list(projectName);
     }
 
     @Override
     public List<CodeRemark> list(@NotNull final String projectName, @NotNull final String fileName, @NotNull final String contentHash) {
-        initialize(projectName);
+        initializeFromDisk(projectName);
         return delegate.list(projectName, fileName, contentHash);
     }
 
     @Override
+    public boolean exists(@NotNull final String projectName, @NotNull final String fileName, @NotNull final String contentHash) {
+        initializeFromDisk(projectName);
+        return delegate.exists(projectName, fileName, contentHash);
+    }
+
+    @Override
     public CodeRemark get(@NotNull final String projectName, @NotNull final String fileName, @NotNull final String contentHash, final int lineNumber) {
-        initialize(projectName);
+        initializeFromDisk(projectName);
         return delegate.get(projectName, fileName, contentHash, lineNumber);
     }
 
@@ -71,41 +78,32 @@ public class CodeRemarkSerializableRepositoryWrapper implements CodeRemarkReposi
     }
 
     @Override
+    public void saveBatch(final List<CodeRemark> codeRemarks) {
+        delegate.saveBatch(codeRemarks);
+
+        codeRemarks.stream().collect(Collectors.groupingBy(CodeRemark::getContentHash)).forEach((k, v) -> {
+            if (!v.isEmpty()) {
+                final CodeRemark codeRemark = v.get(0);
+                persistToDisk(codeRemark.getProjectName(), codeRemark.getFileName(), codeRemark.getContentHash());
+            }
+        });
+    }
+
+    @Override
     public void remove(@NotNull final String projectName, @NotNull final String fileName, @NotNull final String contentHash, final int lineNumber) {
         delegate.remove(projectName, fileName, contentHash, lineNumber);
         persistToDisk(projectName, fileName, contentHash);
     }
 
-    // TODO: Optimize performance.
-    void initialize(@NotNull final String projectName) {
-        if (!initialized) {
-            try {
-                // ~/.code-remark/{projectName}
-                Files.walk(Paths.get(mBasePath.toFile().getAbsolutePath(), projectName)).forEach(e -> {
-                    final File localFile = e.toFile();
-                    if (localFile.exists()) {
-                        List<CodeRemark> codeRemarks = new ArrayList<>();
-                        try (final ObjectInputStream stream = new ObjectInputStream(
-                                new FileInputStream(localFile))) {
-                            codeRemarks = Arrays.asList((CodeRemark[]) stream.readObject());
-                        } catch (final Throwable ignored) {
-                        }
-
-                        if (!codeRemarks.isEmpty())
-                            CodeRemarkCQengineRepository.mCodeRemarks.addAll(codeRemarks);
-                    }
-                });
-            } catch (final IOException ignored) {
-            } finally {
-                initialized = true;
-            }
-        }
+    @Override
+    public void remove(@NotNull final String projectName, @NotNull final String fileName, @NotNull final String contentHash) {
+        delegate.remove(projectName, fileName, contentHash);
+        persistToDisk(projectName, fileName, contentHash);
     }
 
-
-    // TODO: Optimize performance.
     @SuppressWarnings("ResultOfMethodCallIgnored")
     void persistToDisk(final String projectName, final String fileName, final String contentHash) {
+        final long begin = System.currentTimeMillis();
         final File baseDir = mBasePath.toFile();
         if (!baseDir.exists())
             baseDir.mkdirs(); // if baseDir not exists, mkdir it.
@@ -124,13 +122,43 @@ public class CodeRemarkSerializableRepositoryWrapper implements CodeRemarkReposi
 
         if (codeRemarks.size() > 0) {
             if (localFile.exists())
-                localFile.delete(); // Remove old, write new.
-
+                localFile.delete(); // Remove old, write new
             try (final ObjectOutputStream stream = new ObjectOutputStream(
                     new FileOutputStream(localFile))) {
                 stream.writeObject(codeRemarks.toArray(new CodeRemark[0]));
             } catch (final IOException ignored) {
             }
+        }
+
+        System.out.printf("persistToDisk(%s, %s) %d ms\n", projectName, fileName, System.currentTimeMillis() - begin);
+        // CodeRemarkCQengineRepository.mCodeRemarks.forEach(System.out::println);
+    }
+
+    void initializeFromDisk(@NotNull final String projectName) {
+        if (initialized) return; // Skipped.
+
+        try {
+            // ~/.code-remark/{projectName}
+            final Path path = Paths.get(mBasePath.toFile().getAbsolutePath(), projectName);
+            Files.walk(path).forEach(e -> {
+                final File localFile = e.toFile();
+                if (localFile.exists()) {
+
+                    // Load with local file.
+                    List<CodeRemark> codeRemarks = new ArrayList<>();
+                    try (final ObjectInputStream stream = new ObjectInputStream(
+                            new FileInputStream(localFile))) {
+                        codeRemarks = Arrays.asList((CodeRemark[]) stream.readObject());
+                    } catch (final Throwable ignored) {
+                    }
+
+                    if (!codeRemarks.isEmpty())
+                        CodeRemarkCQengineRepository.mCodeRemarks.addAll(codeRemarks);
+                }
+            });
+        } catch (final IOException ignored) {
+        } finally {
+            initialized = true;
         }
     }
 }

@@ -56,7 +56,7 @@ public class ToggleRemarkIntentionAction extends BaseIntentionAction implements 
 
     @Override
     public boolean isAvailable(@NotNull final Project project, final Editor editor, final PsiFile file) {
-        return null != file && null != editor && !file.isWritable();
+        return null != file && null != editor;
     }
 
     @Override

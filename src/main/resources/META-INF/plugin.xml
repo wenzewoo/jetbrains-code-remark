@@ -37,7 +37,7 @@
 
     <p>A Jetbrains IDE code remark plug-in, it can be applied to read-only source code files.</p>
     <ol>
-        <li>Open the source code file with IDEA. <em>(Note: For the time being, only read-only source code files are supported)</em></li>
+        <li>Open the source code file with IDEA.</li>
         <li>
             Wherever you need it, choose one of the following three ways to trigger the Popup pop-up layer and add content
             <ol>
@@ -56,7 +56,7 @@
     <br/>
     <p>一款Jetbrains系IDE代码备注插件，不同于代码注释，它可被应用于只读的源码文件，让你在阅读源码时如虎添翼。</p>
     <ol>
-        <li>将源码文件使用IDEA打开。<em>（注意：暂时仅支持只读的源码文件）</em></li>
+        <li>将源码文件使用IDEA打开。</li>
         <li>
             在任何需要的地方，以下三种方式任选其一，触发Popup弹出层，添加内容。
             <ol>
@@ -79,8 +79,14 @@
 
 
     <projectListeners>
+        <listener topic="com.intellij.openapi.fileEditor.FileDocumentManagerListener"
+                  class="com.github.wenzewoo.coderemark.listener.CodeRemarkDocumentManagerListener"/>
+
         <listener topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"
                   class="com.github.wenzewoo.coderemark.listener.CodeRemarkEditorManagerListener"/>
+
+        <listener topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"
+                  class="com.github.wenzewoo.coderemark.listener.CodeRemarkBulkFileListener"/>
     </projectListeners>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -99,6 +105,7 @@
         <action text="Remark Navigation"
                 id="com.github.wenzewoo.coderemark.action.menu.RemarkNavigationMenuAction"
                 class="com.github.wenzewoo.coderemark.action.menu.RemarkNavigationMenuAction">
+            <keyboard-shortcut keymap="$default" first-keystroke="shift N"/>
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
         </action>
 

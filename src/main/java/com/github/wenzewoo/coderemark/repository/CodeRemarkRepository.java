@@ -25,19 +25,56 @@
 package com.github.wenzewoo.coderemark.repository;
 
 import com.github.wenzewoo.coderemark.CodeRemark;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 public interface CodeRemarkRepository {
 
+    default List<CodeRemark> list(@NotNull final Project project) {
+        return list(project.getName());
+    }
+
     List<CodeRemark> list(@NotNull String projectName);
 
+
+    default List<CodeRemark> list(@NotNull final Project project, @NotNull final VirtualFile file) {
+        return list(project.getName(), file.getName(), CodeRemark.createContentHash(project, file));
+    }
+
     List<CodeRemark> list(@NotNull String projectName, @NotNull String fileName, @NotNull String contentHash);
+
+
+    default boolean exists(@NotNull final Project project, @NotNull final VirtualFile file) {
+        return exists(project.getName(), file.getName(), CodeRemark.createContentHash(project, file));
+    }
+
+    boolean exists(@NotNull String projectName, @NotNull String fileName, @NotNull String contentHash);
+
+
+    default CodeRemark get(@NotNull Project project, @NotNull VirtualFile file, int lineNumber) {
+        return get(project.getName(), file.getName(), CodeRemark.createContentHash(project, file), lineNumber);
+    }
 
     CodeRemark get(@NotNull String projectName, @NotNull String fileName, @NotNull String contentHash, int lineNumber);
 
     void save(CodeRemark codeRemark);
 
+    void saveBatch(List<CodeRemark> codeRemarks);
+
+
+    default void remove(@NotNull Project project, @NotNull VirtualFile file, int lineNumber) {
+        remove(project.getName(), file.getName(), CodeRemark.createContentHash(project, file), lineNumber);
+    }
+
     void remove(@NotNull String projectName, @NotNull String fileName, @NotNull String contentHash, int lineNumber);
+
+    
+    default void remove(@NotNull Project project, @NotNull VirtualFile file) {
+        remove(project.getName(), file.getName(), CodeRemark.createContentHash(project, file));
+    }
+
+    void remove(@NotNull String projectName, @NotNull String fileName, @NotNull String contentHash);
 }

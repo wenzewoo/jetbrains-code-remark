@@ -35,7 +35,7 @@ public class CodeRemarkRepositoryFactory {
         private final CodeRemarkRepository instance;
 
         Singleton() {
-            instance = new CodeRemarkSerializableRepositoryWrapper(new CodeRemarkCQengineRepository());
+            instance = new CodeRemarkCQengineSerializableWrapper(new CodeRemarkCQengineRepository());
         }
 
         public CodeRemarkRepository getInstance() {

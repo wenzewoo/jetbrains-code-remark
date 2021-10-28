@@ -101,7 +101,6 @@ public class PopupUtils {
             action.registerCustomShortcutSet();
             actionGroup.add(action);
         }
-
         return popup;
     }
 }

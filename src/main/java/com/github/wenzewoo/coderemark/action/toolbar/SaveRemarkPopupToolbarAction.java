@@ -24,12 +24,15 @@
 
 package com.github.wenzewoo.coderemark.action.toolbar;
 
+import com.github.wenzewoo.coderemark.CodeRemark;
 import com.github.wenzewoo.coderemark.exception.UiIllegalArgumentException;
+import com.github.wenzewoo.coderemark.repository.CodeRemarkRepositoryFactory;
 import com.github.wenzewoo.coderemark.toolkit.EditorUtils;
 import com.github.wenzewoo.coderemark.toolkit.StringUtils;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.actionSystem.Shortcut;
+import com.intellij.openapi.command.WriteCommandAction;
 import org.jetbrains.annotations.NotNull;
 
 public class SaveRemarkPopupToolbarAction extends BasePopupToolbarAction {
@@ -50,7 +53,13 @@ public class SaveRemarkPopupToolbarAction extends BasePopupToolbarAction {
             throw new UiIllegalArgumentException("Please enter the content");
 
         EditorUtils.addAfterLineCodeRemark(event.getEditor(), event.getLineNumber(), text);
-        getPublisher().codeRemarkChanged(event.getProject(), event.getFile(), event.getLineNumber(), text);
+
+        WriteCommandAction.runWriteCommandAction(event.getProject(), () -> {
+            // Save to repository.
+            CodeRemarkRepositoryFactory.getInstance().save(
+                    new CodeRemark(event.getProject(), event.getFile(), event.getLineNumber(), text));
+            getPublisher().codeRemarkChanged(event.getProject(), event.getFile());
+        });
         super.dispose();
     }
 }

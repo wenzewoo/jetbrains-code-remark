@@ -24,11 +24,13 @@
 
 package com.github.wenzewoo.coderemark.action.toolbar;
 
+import com.github.wenzewoo.coderemark.repository.CodeRemarkRepositoryFactory;
 import com.github.wenzewoo.coderemark.toolkit.EditorUtils;
 import com.github.wenzewoo.coderemark.toolkit.PopupUtils;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.actionSystem.Shortcut;
+import com.intellij.openapi.command.WriteCommandAction;
 import org.jetbrains.annotations.NotNull;
 
 public class RemoveRemarkPopupToolbarAction extends BasePopupToolbarAction {
@@ -46,7 +48,14 @@ public class RemoveRemarkPopupToolbarAction extends BasePopupToolbarAction {
     public void actionPerformed(@NotNull final PopupActionEvent event) {
         PopupUtils.createConfirmation(getTemplateText(), () -> {
             EditorUtils.clearAfterLineEndCodeRemark(event.getEditor(), event.getLineNumber());
-            getPublisher().codeRemarkRemoved(event.getProject(), event.getFile(), event.getLineNumber());
+
+            WriteCommandAction.runWriteCommandAction(event.getProject(), () -> {
+                // Remove from repository.
+                CodeRemarkRepositoryFactory.getInstance().remove(
+                        event.getProject(), event.getFile(), event.getLineNumber());
+
+                getPublisher().codeRemarkChanged(event.getProject(), event.getFile());
+            });
 
             super.dispose();
         }).showInFocusCenter();

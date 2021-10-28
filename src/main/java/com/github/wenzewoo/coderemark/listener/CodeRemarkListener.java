@@ -24,8 +24,6 @@
 
 package com.github.wenzewoo.coderemark.listener;
 
-import com.github.wenzewoo.coderemark.repository.CodeRemarkRepository;
-import com.github.wenzewoo.coderemark.repository.CodeRemarkRepositoryFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.messages.Topic;
@@ -33,14 +31,7 @@ import org.jetbrains.annotations.NotNull;
 
 public interface CodeRemarkListener {
     Topic<CodeRemarkListener> TOPIC = Topic.create("CodeRemarks", CodeRemarkListener.class);
-    
-    default CodeRemarkRepository getRepository() {
-        return CodeRemarkRepositoryFactory.getInstance();
-    }
 
-    default void codeRemarkRemoved(@NotNull final Project project, @NotNull final VirtualFile file, final int lineNumber) {
-    }
-
-    default void codeRemarkChanged(@NotNull final Project project, @NotNull final VirtualFile file, final int lineNumber, final String text) {
+    default void codeRemarkChanged(@NotNull final Project project, @NotNull final VirtualFile file) {
     }
 }

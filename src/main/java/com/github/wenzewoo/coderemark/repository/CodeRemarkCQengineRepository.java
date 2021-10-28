@@ -55,7 +55,8 @@ public class CodeRemarkCQengineRepository implements CodeRemarkRepository {
     @Override
     public List<CodeRemark> list(@NotNull final String projectName) {
         return mCodeRemarks.retrieve(equal(PROJECT_NAME, projectName)).stream()
-                .sorted(Comparator.comparing(CodeRemark::getFileName).thenComparing(CodeRemark::getLineNumber)).collect(Collectors.toList());
+                .sorted(Comparator.comparing(CodeRemark::getFileName).thenComparing(CodeRemark::getLineNumber))
+                .collect(Collectors.toList());
     }
 
 
@@ -71,31 +72,61 @@ public class CodeRemarkCQengineRepository implements CodeRemarkRepository {
     }
 
     @Override
+    public boolean exists(@NotNull final String projectName, @NotNull final String fileName, @NotNull final String contentHash) {
+        return mCodeRemarks.retrieve(
+                and(equal(PROJECT_NAME, projectName),
+                        equal(FILE_NAME, fileName),
+                        equal(CONTENT_HASH, contentHash))).size() > 0;
+    }
+
+    @Override
     public CodeRemark get(@NotNull final String projectName, @NotNull final String fileName, @NotNull final String contentHash, final int lineNumber) {
         return mCodeRemarks.retrieve(
                 and(equal(PROJECT_NAME, projectName),
                         equal(FILE_NAME, fileName),
                         equal(CONTENT_HASH, contentHash),
-                        equal(LINE_NUMBER, lineNumber))).stream().findFirst().orElse(null);
+                        equal(LINE_NUMBER, lineNumber)))
+                .stream().findFirst().orElse(null);
     }
 
     @Override
     public void save(final CodeRemark codeRemark) {
-        removeIfExists(codeRemark.getProjectName(), codeRemark.getFileName(), codeRemark.getContentHash(), codeRemark.getLineNumber());
+        removeWith(codeRemark);
         mCodeRemarks.add(codeRemark);
     }
 
-    void removeIfExists(final String projectName, final String fileName, final String contentHash, final int lineNumber) {
+    @Override
+    public void saveBatch(final List<CodeRemark> codeRemarks) {
+        for (final CodeRemark codeRemark : codeRemarks)
+            removeWith(codeRemark);
+        mCodeRemarks.addAll(codeRemarks);
+    }
+
+    void removeWith(final CodeRemark codeRemark) {
+        mCodeRemarks.retrieve(
+                and(equal(PROJECT_NAME, codeRemark.getProjectName()),
+                        equal(FILE_NAME, codeRemark.getFileName()),
+                        equal(CONTENT_HASH, codeRemark.getContentHash()),
+                        equal(LINE_NUMBER, codeRemark.getLineNumber())))
+                .stream().forEach(mCodeRemarks::remove);
+    }
+
+    @Override
+    public void remove(@NotNull final String projectName, @NotNull final String fileName, @NotNull final String contentHash, final int lineNumber) {
         mCodeRemarks.retrieve(
                 and(equal(PROJECT_NAME, projectName),
                         equal(FILE_NAME, fileName),
                         equal(CONTENT_HASH, contentHash),
                         equal(LINE_NUMBER, lineNumber)))
-                .stream().findFirst().ifPresent(mCodeRemarks::remove);
+                .stream().forEach(mCodeRemarks::remove);
     }
 
     @Override
-    public void remove(@NotNull final String projectName, @NotNull final String fileName, @NotNull final String contentHash, final int lineNumber) {
-        removeIfExists(projectName, fileName, contentHash, lineNumber);
+    public void remove(@NotNull final String projectName, @NotNull final String fileName, @NotNull final String contentHash) {
+        mCodeRemarks.retrieve(
+                and(equal(PROJECT_NAME, projectName),
+                        equal(FILE_NAME, fileName),
+                        equal(CONTENT_HASH, contentHash)))
+                .stream().forEach(mCodeRemarks::remove);
     }
 }

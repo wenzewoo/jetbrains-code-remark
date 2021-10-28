@@ -41,6 +41,9 @@ import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.openapi.editor.impl.FontInfo;
 import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.openapi.editor.markup.TextAttributes;
+import com.intellij.openapi.ui.popup.JBPopup;
+import com.intellij.openapi.ui.popup.JBPopupListener;
+import com.intellij.openapi.ui.popup.LightweightWindowEvent;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.paint.EffectPainter;
 import com.intellij.util.ui.UIUtil;
@@ -61,12 +64,12 @@ public class CodeRemarkEditorInlineInlayRenderer
 
     private final String text;
     private boolean isHovered = false;
+    private boolean isEditorShowing = false;
     private int textStartXCoordinate = -1;
 
     public CodeRemarkEditorInlineInlayRenderer(@NotNull final String text) {
         this.text = text;
     }
-
 
     @Override
     public int calcWidthInPixels(@NotNull final Inlay inlay) {
@@ -114,10 +117,20 @@ public class CodeRemarkEditorInlineInlayRenderer
     }
 
     public void onMouseClicked(@NotNull final Inlay inlay, @NotNull final EditorMouseEvent event) {
+        if (isEditorShowing) return;
+
         final VirtualFile file = EditorUtils.getVirtualFile(event.getEditor());
         if (null != file) {
-            PopupUtils.createCodeRemarkEditor(event.getEditor(), file, "Edit remark", text,
-                    new SaveRemarkPopupToolbarAction(), new RemoveRemarkPopupToolbarAction()).showInBestPositionFor(event.getEditor());
+            isEditorShowing = true;
+            final JBPopup popup = PopupUtils.createCodeRemarkEditor(event.getEditor(), file, "Edit remark", text,
+                    new SaveRemarkPopupToolbarAction(), new RemoveRemarkPopupToolbarAction());
+            popup.addListener(new JBPopupListener() {
+                @Override
+                public void onClosed(@NotNull final LightweightWindowEvent event) {
+                    isEditorShowing = false;
+                }
+            });
+            popup.showInBestPositionFor(event.getEditor());
         }
     }
 
@@ -129,6 +142,10 @@ public class CodeRemarkEditorInlineInlayRenderer
         setHovered(false, inlay, event.getEditor());
     }
 
+
+    public String getText() {
+        return text;
+    }
 
     private void setHovered(final boolean active, @NotNull final Inlay inlay, @NotNull final Editor editor) {
         if (editor instanceof EditorEx) {

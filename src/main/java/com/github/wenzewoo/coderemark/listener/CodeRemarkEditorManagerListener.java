@@ -24,11 +24,8 @@
 
 package com.github.wenzewoo.coderemark.listener;
 
-import com.github.wenzewoo.coderemark.CodeRemark;
-import com.github.wenzewoo.coderemark.repository.CodeRemarkRepository;
 import com.github.wenzewoo.coderemark.repository.CodeRemarkRepositoryFactory;
 import com.github.wenzewoo.coderemark.toolkit.EditorUtils;
-import com.github.wenzewoo.coderemark.toolkit.VirtualFileUtils;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -38,37 +35,25 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
-public class CodeRemarkEditorManagerListener implements FileEditorManagerListener, CodeRemarkListener {
-    private boolean isSubscribed = false;
-    private final static CodeRemarkRepository mCodeRemarkRepository = CodeRemarkRepositoryFactory.getInstance();
+public class CodeRemarkEditorManagerListener implements FileEditorManagerListener {
 
     @Override
     public void fileOpened(@NotNull final FileEditorManager source, @NotNull final VirtualFile file) {
         final Project project = source.getProject();
         CodeRemarkEditorInlineInlayListener.getInstance(project).startListening();
-        if (!isSubscribed) {
-            isSubscribed = true;
-            project.getMessageBus().connect().subscribe(CodeRemarkListener.TOPIC, this);
-        }
 
-        final FileEditor fileEditor = source.getSelectedEditor(file);
-        if (!(fileEditor instanceof TextEditor)) return;
+        final Editor editor = getEditor(source, file);
+        if (null == editor) return; // Skipped.
 
-        final Editor editor = ((TextEditor) fileEditor).getEditor();
-
-        final String contentHash = VirtualFileUtils.getContentHash(file);
-        mCodeRemarkRepository.list(project.getName(), file.getName(), contentHash).forEach(codeRemark -> {
+        CodeRemarkRepositoryFactory.getInstance().list(project, file).forEach(codeRemark -> {
             EditorUtils.addAfterLineCodeRemark(editor, codeRemark.getLineNumber(), codeRemark.getText());
         });
     }
 
-    @Override
-    public void codeRemarkRemoved(@NotNull final Project project, @NotNull final VirtualFile file, final int lineNumber) {
-        mCodeRemarkRepository.remove(project.getName(), file.getName(), VirtualFileUtils.getContentHash(file), lineNumber);
-    }
+    private Editor getEditor(@NotNull final FileEditorManager source, @NotNull final VirtualFile file) {
+        final FileEditor fileEditor = source.getSelectedEditor(file);
+        if (!(fileEditor instanceof TextEditor)) return null;
 
-    @Override
-    public void codeRemarkChanged(@NotNull final Project project, @NotNull final VirtualFile file, final int lineNumber, final String text) {
-        mCodeRemarkRepository.save(new CodeRemark(project, file, lineNumber, text));
+        return ((TextEditor) fileEditor).getEditor();
     }
 }

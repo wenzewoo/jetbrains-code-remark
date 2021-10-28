@@ -51,12 +51,15 @@ public class EditorUtils {
 
     public static void addAfterLineEndElement(
             @NotNull final Editor editor, final int lineNumber, @NotNull final EditorCustomElementRenderer renderer) {
+        try {
+            // if exists, clear it.
+            clearAfterLineEndElement(editor, lineNumber, renderer.getClass());
 
-        // if exists, clear it.
-        clearAfterLineEndElement(editor, lineNumber, renderer.getClass());
-
-        final int endOffset = editor.getDocument().getLineEndOffset(lineNumber);
-        editor.getInlayModel().addAfterLineEndElement(endOffset, true, renderer);
+            final int endOffset = editor.getDocument().getLineEndOffset(lineNumber);
+            editor.getInlayModel().addAfterLineEndElement(endOffset, true, renderer);
+        } catch (final Throwable e) {
+            e.printStackTrace();
+        }
     }
 
     public static void clearAfterLineEndCodeRemark(@NotNull final Editor editor, final int lineNumber) {
@@ -65,11 +68,14 @@ public class EditorUtils {
 
     public static void clearAfterLineEndElement(
             @NotNull final Editor editor, final int lineNumber, @NotNull final Class<? extends EditorCustomElementRenderer> rendererClass) {
-
-        editor.getInlayModel().getAfterLineEndElementsForLogicalLine(lineNumber).forEach(inlay -> {
-            if (inlay.getRenderer().getClass().getName().equals(rendererClass.getName())) {
-                Disposer.dispose(inlay); // Destroy Inlay
-            }
-        });
+        try {
+            editor.getInlayModel().getAfterLineEndElementsForLogicalLine(lineNumber).forEach(inlay -> {
+                if (inlay.getRenderer().getClass().getName().equals(rendererClass.getName())) {
+                    Disposer.dispose(inlay); // Destroy Inlay
+                }
+            });
+        } catch (final Throwable e) {
+            e.printStackTrace();
+        }
     }
 }

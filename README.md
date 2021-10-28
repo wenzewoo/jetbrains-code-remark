@@ -15,7 +15,7 @@ via [releases](https://github.com/wenzewoo/jetbrains-code-remark/releases) and i
 
 The source code is a read-only file, how to add remarks?
 
-- Use IDEA to open the source code file (note: only read-only source code files are supported for the time being).
+- Use IDEA to open the source code file.
 
 - Wherever you need it, you can choose one of the following three ways to trigger the Popup pop-up layer and add
   content.
@@ -31,6 +31,7 @@ The source code is a read-only file, how to add remarks?
 # HOT KEY
 
 - Add / Edit：<`shift` + `R`>
+- Navigation(current file): <`shift` + `N`>
 - Saving：<`shift` + `ENTER`>
 - Delete：<`shift` + `DETELE`>
 - Cancel：<`ESC`>

@@ -27,7 +27,6 @@ package com.github.wenzewoo.coderemark.action.menu;
 import com.github.wenzewoo.coderemark.CodeRemark;
 import com.github.wenzewoo.coderemark.action.BaseToggleRemarkAction;
 import com.github.wenzewoo.coderemark.toolkit.EditorUtils;
-import com.github.wenzewoo.coderemark.toolkit.VirtualFileUtils;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -56,13 +55,12 @@ public class ToggleRemarkMenuAction extends AnAction implements BaseToggleRemark
         }
 
         final VirtualFile file = CommonDataKeys.VIRTUAL_FILE.getData(e.getDataContext());
-        if (null == file || file.isWritable()) {
+        if (null == file) {
             e.getPresentation().setEnabledAndVisible(false);
             return;
         }
         final int lineNumber = EditorUtils.getLineNumber(editor);
-        final CodeRemark codeRemark = getRepository().get(
-                project.getName(), file.getName(), VirtualFileUtils.getContentHash(file), lineNumber);
+        final CodeRemark codeRemark = getRepository().get(project, file, lineNumber);
         e.getPresentation().setText((null != codeRemark ? "Edit Remark" : "Add Remark"));
     }
 

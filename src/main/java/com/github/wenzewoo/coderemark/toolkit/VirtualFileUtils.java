@@ -24,6 +24,7 @@
 
 package com.github.wenzewoo.coderemark.toolkit;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,11 +33,22 @@ import java.io.IOException;
 
 public class VirtualFileUtils {
 
-    public static String getContentHash(@NotNull final VirtualFile file) {
+    public static String getRelativePath(@NotNull final Project project, final String canonicalPath) {
+        if (StringUtils.isEmpty(canonicalPath)) return canonicalPath;
+        final String projectBasePath = project.getBasePath();
+        if (StringUtils.isEmpty(projectBasePath) || !canonicalPath.startsWith(projectBasePath)) return canonicalPath;
+        return canonicalPath.substring(projectBasePath.length());
+    }
+
+    public static String getRelativePath(@NotNull final Project project, @NotNull final VirtualFile file) {
+        return getRelativePath(project, file.getCanonicalPath());
+    }
+
+    public static byte[] getContentBytes(@NotNull final VirtualFile file) {
         try {
-            return DigestUtils.hashMD5(file.contentsToByteArray(true));
+            return file.contentsToByteArray(true);
         } catch (final IOException e) {
-            throw new IllegalArgumentException("Get file content hash error, file is " + file.getCanonicalPath() + ", " + e.getMessage());
+            throw new IllegalArgumentException("Get file contentsToByteArray error, file is " + file.getCanonicalPath() + ", " + e.getMessage());
         }
     }
 }

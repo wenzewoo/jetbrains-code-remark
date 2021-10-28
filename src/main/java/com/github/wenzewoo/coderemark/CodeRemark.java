@@ -24,12 +24,12 @@
 
 package com.github.wenzewoo.coderemark;
 
-import com.github.wenzewoo.coderemark.toolkit.StringUtils;
+import com.github.wenzewoo.coderemark.toolkit.DigestUtils;
 import com.github.wenzewoo.coderemark.toolkit.VirtualFileUtils;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.project.ProjectLocator;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.pom.Navigatable;
@@ -45,7 +45,7 @@ public class CodeRemark implements Serializable, Navigatable {
     private String projectName;
     private String fileName;
     private String fileUrl;
-    private String contentHash;
+    private String contentHash; // relativePath.md5() or fileBody.bytes().md5()
     private int lineNumber;
     private String text;
 
@@ -59,7 +59,7 @@ public class CodeRemark implements Serializable, Navigatable {
         projectName = project.getName();
         fileName = file.getName();
         fileUrl = file.getUrl();
-        contentHash = VirtualFileUtils.getContentHash(file);
+        contentHash = CodeRemark.createContentHash(project, file);
         this.lineNumber = lineNumber;
         this.text = text;
         target = new OpenFileDescriptor(project, file, lineNumber, -1, true);
@@ -69,42 +69,52 @@ public class CodeRemark implements Serializable, Navigatable {
         return AllIcons.General.BalloonInformation;
     }
 
+
+    public static String createContentHash(@NotNull final String relativePath) {
+        return DigestUtils.hashMD5(relativePath.getBytes());
+    }
+
+    public static String createContentHash(@NotNull final Project project, @NotNull final VirtualFile file) {
+        if (!file.isWritable())
+            return DigestUtils.hashMD5(VirtualFileUtils.getContentBytes(file));
+
+        return createContentHash(VirtualFileUtils.getRelativePath(project, file));
+    }
+
+
     @Override
     public void navigate(final boolean requestFocus) {
-        getTarget(null).navigate(requestFocus);
+        final OpenFileDescriptor target = getTarget(null);
+        if (null == target) return;
+        target.navigate(requestFocus);
     }
 
     @Override
     public boolean canNavigate() {
-        return getTarget(null).canNavigate();
+        final OpenFileDescriptor target = getTarget(null);
+        if (null == target) return false;
+        return target.canNavigate();
     }
 
     @Override
     public boolean canNavigateToSource() {
-        return getTarget(null).canNavigateToSource();
+        final OpenFileDescriptor target = getTarget(null);
+        if (null == target) return false;
+        return target.canNavigateToSource();
     }
 
-    private Project getCurrentProject() {
-        final @NotNull Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
-        for (final Project openProject : openProjects) {
-            if (StringUtils.equals(projectName, openProject.getName()))
-                return openProject;
-        }
-        return ProjectManager.getInstance().getDefaultProject();
-    }
-
-
+    
     public OpenFileDescriptor getTarget(@Nullable Project project) {
         // If target is null, indicates that the object is deserialized.
         if (null == target) {
-            if (null == project) {
-                project = getCurrentProject();
-            }
-
             final VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(fileUrl);
-            if (null != file) {
-                target = new OpenFileDescriptor(project, file, lineNumber, -1, true);
-            }
+            if (null == file) return null;
+
+            if (null == project)
+                project = ProjectLocator.getInstance().guessProjectForFile(file);
+
+            if (null == project) return null;
+            target = new OpenFileDescriptor(project, file, lineNumber, -1, true);
         }
         return target;
     }
@@ -156,5 +166,16 @@ public class CodeRemark implements Serializable, Navigatable {
 
     public void setText(final String text) {
         this.text = text;
+    }
+
+    @Override
+    public String toString() {
+        return "CodeRemark{" +
+                "projectName='" + projectName + '\'' +
+                ", fileName='" + fileName + '\'' +
+                ", contentHash='" + contentHash + '\'' +
+                ", lineNumber=" + lineNumber +
+                ", text='" + text + '\'' +
+                '}';
     }
 }
