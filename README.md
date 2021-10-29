@@ -31,7 +31,7 @@ The source code is a read-only file, how to add remarks?
 # HOT KEY
 
 - Add / Edit：<`shift` + `R`>
-- Navigation(current file): <`shift` + `N`>
+- Navigation(current file): <`shift` + `E`>
 - Saving：<`shift` + `ENTER`>
 - Delete：<`shift` + `DETELE`>
 - Cancel：<`ESC`>
