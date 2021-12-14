@@ -41,9 +41,8 @@
         <li>
             Wherever you need it, choose one of the following three ways to trigger the Popup pop-up layer and add content
             <ol>
-                <li><b>Alt</b> + <b>ENTER</b> ->  <b>[MARK] Add/Edit remark</b></li>
+                <li><b>Alt</b> + <b>ENTER</b> ->  <b>[MARK] Add/Edit remark</b>[RECOMMEND]</li>
                 <li><b>EditorPopupMenu</b> / <b>Tools</b> ->  <b>Add remark</b></li>
-                <li><b>shift + R</b> [RECOMMEND]</li>
             </ol>
         </li>
         <li>In the editor, use the right-click menu <b>Remark Navigation</b> to preview all the remarks added in the current file.</li>
@@ -60,9 +59,8 @@
         <li>
             在任何需要的地方，以下三种方式任选其一，触发Popup弹出层，添加内容。
             <ol>
-                <li><b>Alt</b> + <b>ENTER</b> ->  <b>[MARK] Add/Edit remark</b></li>
+                <li><b>Alt</b> + <b>ENTER</b> ->  <b>[MARK] Add/Edit remark</b> [推荐]</li>
                 <li><b>EditorPopupMenu</b> / <b>Tools</b> ->  <b>Add remark</b></li>
-                <li><b>shift + R</b> [推荐]</li>
             </ol>
         </li>
         <li>在编辑器中使用右键菜单 <b>Remark Navigation</b> 预览当前文件添加的所有备注信息。</li>
@@ -105,7 +103,6 @@
         <action text="Remark Navigation"
                 id="com.github.wenzewoo.coderemark.action.menu.RemarkNavigationMenuAction"
                 class="com.github.wenzewoo.coderemark.action.menu.RemarkNavigationMenuAction">
-            <keyboard-shortcut keymap="$default" first-keystroke="shift N"/>
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
         </action>
 
@@ -113,8 +110,6 @@
                 icon="general/balloonInformation.svg"
                 id="com.github.wenzewoo.coderemark.action.menu.ToggleRemarkMenuAction"
                 class="com.github.wenzewoo.coderemark.action.menu.ToggleRemarkMenuAction">
-            <keyboard-shortcut keymap="$default" first-keystroke="shift R"/>
-            <add-to-group group-id="ToolsMenu" anchor="first"/>
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
         </action>
     </actions>

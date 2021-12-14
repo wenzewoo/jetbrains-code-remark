@@ -20,9 +20,8 @@ The source code is a read-only file, how to add remarks?
 - Wherever you need it, you can choose one of the following three ways to trigger the Popup pop-up layer and add
   content.
 
-  - `Alt` + `ENTER` ->  `[MARK] Add/Edit remark`
+  - `Alt` + `ENTER` ->  `[MARK] Add/Edit remark` [RECOMMEND]
   - `EditorPopupMenu` / `Tools` ->  `Add remark`
-  - `shift + R` [RECOMMEND]
 
 - Use the right-click menu `Remark Navigation` in the editor to preview all the remarks added in the current file.
 
@@ -30,8 +29,7 @@ The source code is a read-only file, how to add remarks?
 
 # HOT KEY
 
-- Add / Edit：<`shift` + `R`>
-- Navigation(current file): <`shift` + `E`>
+- Add / Edit：<`Alt` + `ENTER`> -> `[MARK] Add/Edit remark` [RECOMMEND]
 - Saving：<`shift` + `ENTER`>
 - Delete：<`shift` + `DETELE`>
 - Cancel：<`ESC`>

@@ -18,9 +18,8 @@
 
 - 在任何需要的地方，以下三种方式任选其一，触发Popup弹出层，添加内容。
 
-  - `Alt` + `ENTER` ->  `[MARK] Add/Edit remark`
+  - `Alt` + `ENTER` ->  `[MARK] Add/Edit remark` [推荐]
   - `EditorPopupMenu` / `Tools` ->  `Add remark`
-  - `shift + R` [推荐]
 
 - 在编辑器中使用右键菜单 `Remark Navigation` 预览当前文件添加的所有备注信息。
 
@@ -28,8 +27,7 @@
 
 # 快捷键
 
-- 添加/编辑：<`shift` + `R`>
-- 导航视图（当前文件）: <`shift` + `E`>
+- 添加/编辑：`Alt` + `ENTER` ->  `[MARK] Add/Edit remark` [推荐]
 - 保存：<`shift` + `ENTER`>
 - 删除：<`shift` + `DETELE`>
 - 取消：<`ESC`>
