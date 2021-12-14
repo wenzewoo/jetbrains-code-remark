@@ -59,6 +59,7 @@ public class CodeRemarkDocumentManagerListener implements FileDocumentManagerLis
 
         final Project project = ProjectLocator.getInstance().guessProjectForFile(file);
         if (null == project) return;
+        if (document.getLineCount() == 0) return; // No content, skipped.
 
         final Editor[] editors = EditorFactory.getInstance().getEditors(document, project);
         if (editors.length > 0) {
