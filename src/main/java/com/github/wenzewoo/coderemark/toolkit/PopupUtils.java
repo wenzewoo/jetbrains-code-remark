@@ -44,6 +44,8 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 
+import static com.github.wenzewoo.coderemark.message.CodeRemarkBundle.message;
+
 public class PopupUtils {
 
     public static JBPopup createComponent(final String title, final JComponent component, final JComponent focusComponent) {
@@ -51,7 +53,7 @@ public class PopupUtils {
                 .createComponentPopupBuilder(component, focusComponent)
                 .setCancelKeyEnabled(true)
                 .setTitle(title)
-                .setCancelButton(new IconButton("Cancel?", AllIcons.Actions.Cancel))
+                .setCancelButton(new IconButton(message("cancel.text"), AllIcons.Actions.Cancel))
                 .setResizable(true)
                 .setRequestFocus(true)
                 .setCancelOnClickOutside(false)

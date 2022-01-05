@@ -34,6 +34,8 @@ import com.intellij.psi.PsiFile;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
 
+import static com.github.wenzewoo.coderemark.message.CodeRemarkBundle.message;
+
 @SuppressWarnings("IntentionDescriptionNotFoundInspection")
 public class ToggleRemarkIntentionAction extends BaseIntentionAction implements BaseToggleRemarkAction {
     @Override
@@ -46,7 +48,7 @@ public class ToggleRemarkIntentionAction extends BaseIntentionAction implements 
     public @IntentionName
     @NotNull
     String getText() {
-        return "[MARK] Add/Edit remark";
+        return message("intentionAction.text");
     }
 
     @Override

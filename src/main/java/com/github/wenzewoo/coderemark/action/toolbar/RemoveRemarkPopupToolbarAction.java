@@ -33,10 +33,12 @@ import com.intellij.openapi.actionSystem.Shortcut;
 import com.intellij.openapi.command.WriteCommandAction;
 import org.jetbrains.annotations.NotNull;
 
+import static com.github.wenzewoo.coderemark.message.CodeRemarkBundle.message;
+
 public class RemoveRemarkPopupToolbarAction extends BasePopupToolbarAction {
 
     public RemoveRemarkPopupToolbarAction() {
-        super("Remove this code remark?", AllIcons.Actions.Rollback);
+        super(message("removeRemark.confirm"), AllIcons.Actions.Rollback);
     }
 
     @Override

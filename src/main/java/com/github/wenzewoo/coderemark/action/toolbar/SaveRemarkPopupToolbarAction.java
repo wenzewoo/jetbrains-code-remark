@@ -35,10 +35,12 @@ import com.intellij.openapi.actionSystem.Shortcut;
 import com.intellij.openapi.command.WriteCommandAction;
 import org.jetbrains.annotations.NotNull;
 
+import static com.github.wenzewoo.coderemark.message.CodeRemarkBundle.message;
+
 public class SaveRemarkPopupToolbarAction extends BasePopupToolbarAction {
 
     public SaveRemarkPopupToolbarAction() {
-        super("Save this code remark?", AllIcons.Actions.Commit);
+        super(message("addRemark.confirm"), AllIcons.Actions.Commit);
     }
 
     @Override
@@ -50,7 +52,7 @@ public class SaveRemarkPopupToolbarAction extends BasePopupToolbarAction {
     public void actionPerformed(@NotNull final PopupActionEvent event) {
         final String text = event.getEditorPane().getText();
         if (StringUtils.isEmpty(text))
-            throw new UiIllegalArgumentException("Please enter the content");
+            throw new UiIllegalArgumentException(message("addRemark.emptyText"));
 
         EditorUtils.addAfterLineCodeRemark(event.getEditor(), event.getLineNumber(), text);
 

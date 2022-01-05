@@ -53,6 +53,8 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.awt.*;
 
+import static com.github.wenzewoo.coderemark.message.CodeRemarkBundle.message;
+
 
 @SuppressWarnings("rawtypes")
 public class CodeRemarkEditorInlineInlayRenderer
@@ -122,7 +124,7 @@ public class CodeRemarkEditorInlineInlayRenderer
         final VirtualFile file = EditorUtils.getVirtualFile(event.getEditor());
         if (null != file) {
             isEditorShowing = true;
-            final JBPopup popup = PopupUtils.createCodeRemarkEditor(event.getEditor(), file, "Edit remark", text,
+            final JBPopup popup = PopupUtils.createCodeRemarkEditor(event.getEditor(), file, message("editRemark.text"), text,
                     new SaveRemarkPopupToolbarAction(), new RemoveRemarkPopupToolbarAction());
             popup.addListener(new JBPopupListener() {
                 @Override

@@ -35,6 +35,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
+import static com.github.wenzewoo.coderemark.message.CodeRemarkBundle.message;
+
 @SuppressWarnings("ComponentNotRegistered")
 public class ToggleRemarkMenuAction extends AnAction implements BaseToggleRemarkAction {
 
@@ -61,7 +63,7 @@ public class ToggleRemarkMenuAction extends AnAction implements BaseToggleRemark
         }
         final int lineNumber = EditorUtils.getLineNumber(editor);
         final CodeRemark codeRemark = getRepository().get(project, file, lineNumber);
-        e.getPresentation().setText((null != codeRemark ? "Edit Remark" : "Add Remark"));
+        e.getPresentation().setText((null != codeRemark ? message("editRemark.text") : message("addRemark.text")));
     }
 
     @Override

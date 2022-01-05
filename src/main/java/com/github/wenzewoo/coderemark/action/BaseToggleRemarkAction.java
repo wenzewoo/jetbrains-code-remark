@@ -39,6 +39,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.github.wenzewoo.coderemark.message.CodeRemarkBundle.message;
+
 public interface BaseToggleRemarkAction {
 
     default CodeRemarkRepository getRepository() {
@@ -60,7 +62,7 @@ public interface BaseToggleRemarkAction {
             actions.add(new SaveRemarkPopupToolbarAction());
             if (null != codeRemark)
                 actions.add(new RemoveRemarkPopupToolbarAction());
-            final String title = (null != codeRemark ? "Edit remark" : "Add remark");
+            final String title = (null != codeRemark ? message("editRemark.text") : message("addRemark.text"));
             final String defaultVal = (null != codeRemark ? codeRemark.getText() : null);
             PopupUtils.createCodeRemarkEditor(editor, file, title, defaultVal,
                     actions.toArray(new BasePopupToolbarAction[0])).showInBestPositionFor(editor);

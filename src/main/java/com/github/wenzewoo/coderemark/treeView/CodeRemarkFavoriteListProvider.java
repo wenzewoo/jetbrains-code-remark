@@ -43,9 +43,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import static com.github.wenzewoo.coderemark.message.CodeRemarkBundle.message;
+
 public class CodeRemarkFavoriteListProvider extends AbstractFavoritesListProvider<CodeRemark> implements CodeRemarkListener {
     protected CodeRemarkFavoriteListProvider(@NotNull final Project project) {
-        super(project, "Remarks");
+        super(project, message("favorite.listName"));
         project.getMessageBus().connect().subscribe(CodeRemarkListener.TOPIC, this);
         updateChildren();
     }

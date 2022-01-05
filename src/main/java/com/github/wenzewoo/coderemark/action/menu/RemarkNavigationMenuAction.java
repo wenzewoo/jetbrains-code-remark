@@ -43,12 +43,15 @@ import javax.swing.*;
 import java.util.Collections;
 import java.util.List;
 
+import static com.github.wenzewoo.coderemark.message.CodeRemarkBundle.message;
+
 @SuppressWarnings("ComponentNotRegistered")
 public class RemarkNavigationMenuAction extends AnAction {
 
     @Override
     public void update(@NotNull final AnActionEvent e) {
         super.update(e);
+        e.getPresentation().setText(message("remarkNavigation.text"));
         e.getPresentation().setEnabledAndVisible(currentFileRemarks(e).size() > 0);
     }
 
@@ -57,8 +60,8 @@ public class RemarkNavigationMenuAction extends AnAction {
         final List<CodeRemark> codeRemarks = currentFileRemarks(e);
 
         if (!codeRemarks.isEmpty()) {
-            final String title = StringUtils.format("{0} remarks",
-                    codeRemarks.get(0).getFileName());
+            final String title = StringUtils.format(
+                    message("remarkNavigation.title"), codeRemarks.get(0).getFileName());
 
             final Project project = CommonDataKeys.PROJECT.getData(e.getDataContext());
             final Editor editor = CommonDataKeys.EDITOR.getData(e.getDataContext());
@@ -116,7 +119,7 @@ public class RemarkNavigationMenuAction extends AnAction {
         @NotNull
         String getTextFor(final CodeRemark value) {
             final String text = StringUtils.maxLength(value.getText(), 100);
-            return StringUtils.format("[Line:{0}] {1}", value.getLineNumber() + 1, text);
+            return StringUtils.format("[{0}] {1}", value.getLineNumber() + 1, text);
         }
 
         @Override

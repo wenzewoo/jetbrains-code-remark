@@ -130,7 +130,7 @@ public class CodeRemarkCQengineSerializableWrapper implements CodeRemarkReposito
             }
         }
 
-        System.out.printf("persistToDisk(%s, %s) %d ms\n", projectName, fileName, System.currentTimeMillis() - begin);
+        // System.out.printf("persistToDisk(%s, %s) %d ms\n", projectName, fileName, System.currentTimeMillis() - begin);
         // CodeRemarkCQengineRepository.mCodeRemarks.forEach(System.out::println);
     }
 
