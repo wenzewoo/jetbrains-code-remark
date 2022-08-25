@@ -40,10 +40,14 @@ import static com.googlecode.cqengine.query.QueryFactory.*;
 
 public class CodeRemarkCQengineRepository implements CodeRemarkRepository {
     protected final static IndexedCollection<CodeRemark> mCodeRemarks = new ConcurrentIndexedCollection<>();
-    public final static Attribute<CodeRemark, String> PROJECT_NAME = attribute("projectName", CodeRemark::getProjectName);
-    public final static Attribute<CodeRemark, String> CONTENT_HASH = attribute("contentHash", CodeRemark::getContentHash);
-    public final static Attribute<CodeRemark, String> FILE_NAME = attribute("fileName", CodeRemark::getFileName);
-    public final static Attribute<CodeRemark, Integer> LINE_NUMBER = attribute("lineNumber", CodeRemark::getLineNumber);
+    public final static Attribute<CodeRemark, String> PROJECT_NAME = attribute(CodeRemark.class, String.class,
+            "projectName", CodeRemark::getProjectName);// 规避在JDK14+出现的异常 https://github.com/npgall/cqengine/issues/269
+    public final static Attribute<CodeRemark, String> CONTENT_HASH = attribute(CodeRemark.class, String.class,
+            "contentHash", CodeRemark::getContentHash);
+    public final static Attribute<CodeRemark, String> FILE_NAME = attribute(CodeRemark.class, String.class,
+            "fileName", CodeRemark::getFileName);
+    public final static Attribute<CodeRemark, Integer> LINE_NUMBER = attribute(CodeRemark.class, Integer.class,
+            "lineNumber", CodeRemark::getLineNumber);
 
     static {
         mCodeRemarks.addIndex(HashIndex.onAttribute(PROJECT_NAME));
