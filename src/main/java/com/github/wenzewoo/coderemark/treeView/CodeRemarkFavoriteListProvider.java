@@ -39,8 +39,8 @@ import com.intellij.ui.SimpleTextAttributes;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.util.Collection;
-import java.util.Collections;
+import java.awt.*;
+import java.util.*;
 import java.util.List;
 
 import static com.github.wenzewoo.coderemark.message.CodeRemarkBundle.message;
@@ -52,57 +52,104 @@ public class CodeRemarkFavoriteListProvider extends AbstractFavoritesListProvide
         updateChildren();
     }
 
-    void updateChildren() {
+    private AbstractTreeNode<CodeRemark> createFileNode(List<AbstractTreeNode<CodeRemark>> childNode, AbstractTreeNode parent, CodeRemark subRemark) {
+
+        CodeRemark fileRemark = new CodeRemark();
+        fileRemark.setFileName(subRemark.getFileName());
+        fileRemark.setFileUrl(subRemark.getFileUrl());
+        fileRemark.setContentHash(subRemark.getContentHash());
+        fileRemark.setLineNumber(1);
+        fileRemark.setText("");
+        AbstractTreeNode<CodeRemark> treeNode = new AbstractTreeNode<>(myProject, fileRemark) {
+            @Override
+            protected void update(@NotNull final PresentationData presentation) {
+                presentation.setIcon(CodeRemark.getIcon());
+                String tip = fileRemark.getFileName();
+                presentation.setTooltip(tip);
+                presentation.setPresentableText(tip);
+            }
+
+            @Override
+            public boolean canNavigate() {
+                return false;
+            }
+
+            @Override
+            public boolean canNavigateToSource() {
+                return false;
+            }
+
+            @Override
+            public @NotNull Collection<? extends AbstractTreeNode<?>> getChildren() {
+                return Collections.emptyList();
+            }
+        };
+        treeNode.setParent(parent);
+        childNode.add(treeNode);
+
+        return treeNode;
+    }
+
+    private void createRemarkNode(List<AbstractTreeNode<CodeRemark>> childNode, AbstractTreeNode parent, CodeRemark codeRemark) {
+
+        AbstractTreeNode<CodeRemark> treeNode = new AbstractTreeNode<>(myProject, codeRemark) {
+            @Override
+            protected void update(@NotNull final PresentationData presentation) {
+                presentation.setIcon(CodeRemark.getIcon());
+                String tip = codeRemark.getFileName() + ":" + (codeRemark.getLineNumber() + 1);
+                presentation.setTooltip(tip);
+                presentation.setPresentableText(codeRemark.getText());
+            }
+
+            @Override
+            public boolean canNavigate() {
+                return codeRemark.canNavigate();
+            }
+
+            @Override
+            public boolean canNavigateToSource() {
+                return codeRemark.canNavigateToSource();
+            }
+
+            @Override
+            public void navigate(final boolean requestFocus) {
+                codeRemark.navigate(requestFocus);
+            }
+
+            @Override
+            public @NotNull Collection<? extends AbstractTreeNode<?>> getChildren() {
+                return Collections.emptyList();
+            }
+        };
+        treeNode.setParent(parent);
+        childNode.add(treeNode);
+    }
+
+    private void updateChildren() {
         if (myProject.isDisposed()) return;
         myChildren.clear();
 
         final List<CodeRemark> codeRemarks = CodeRemarkRepositoryFactory.getInstance().list(myProject);
+        Map<String, AbstractTreeNode<CodeRemark>> nodeMap = new HashMap<>();
         for (final CodeRemark codeRemark : codeRemarks) {
-
-            final AbstractTreeNode<CodeRemark> treeNode = new AbstractTreeNode<>(myProject, codeRemark) {
-                @Override
-                protected void update(@NotNull final PresentationData presentation) {
-                    presentation.setIcon(CodeRemark.getIcon());
-                }
-
-                @Override
-                public boolean canNavigate() {
-                    return codeRemark.canNavigate();
-                }
-
-                @Override
-                public boolean canNavigateToSource() {
-                    return codeRemark.canNavigateToSource();
-                }
-
-                @Override
-                public void navigate(final boolean requestFocus) {
-                    codeRemark.navigate(requestFocus);
-                }
-
-                @Override
-                public @NotNull
-                Collection<? extends AbstractTreeNode<?>> getChildren() {
-                    return Collections.emptyList();
-                }
-            };
-            treeNode.setParent(myNode);
-            myChildren.add(treeNode);
+            String file = codeRemark.getFileName();
+//            AbstractTreeNode<CodeRemark> fileNode = nodeMap.getOrDefault(file, createFileNode(codeRemark));
+            createRemarkNode(myChildren, myNode, codeRemark);
         }
         FavoritesManager.getInstance(myProject).fireListeners(getListName(myProject));
     }
 
     @Override
-    public void customizeRenderer(final ColoredTreeCellRenderer renderer, final JTree tree,
-                                  @NotNull final Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
+    public void customizeRenderer(final ColoredTreeCellRenderer renderer, final JTree tree, @NotNull final Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
         if (value instanceof CodeRemark) {
             final CodeRemark codeRemark = (CodeRemark) value;
+            SimpleTextAttributes attr = new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, Color.BLUE);
             if (StringUtils.isNotEmpty(codeRemark.getText()))
-                renderer.append(StringUtils.maxLength(codeRemark.getText(), 20) + " ", SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES, true);
+                renderer.append(StringUtils.maxLength(codeRemark.getText(), 20) + " ", attr, true);
 
-            renderer.append(codeRemark.getFileName(), SimpleTextAttributes.GRAYED_ATTRIBUTES, true);
-            renderer.append(":", SimpleTextAttributes.GRAYED_ATTRIBUTES, true);
-            renderer.append(String.valueOf(codeRemark.getLineNumber() + 1), SimpleTextAttributes.GRAYED_ATTRIBUTES, true);
+            renderer.append(codeRemark.getFileName(), attr, true);
+            renderer.append(":", attr, true);
+            renderer.append(String.valueOf(codeRemark.getLineNumber() + 1), attr, true);
         }
     }
 

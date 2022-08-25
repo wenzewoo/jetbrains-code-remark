@@ -60,7 +60,7 @@ import static com.github.wenzewoo.coderemark.message.CodeRemarkBundle.message;
 public class CodeRemarkEditorInlineInlayRenderer
         implements EditorCustomElementRenderer {
 
-    private final static int RENDERER_TEXT_MAX_LENGTH = 20;
+    private final static int RENDERER_TEXT_MAX_LENGTH = 50;
     private final static Icon HOVERED_SUFFIX_ICON = AllIcons.General.LinkDropTriangle;
 
 
