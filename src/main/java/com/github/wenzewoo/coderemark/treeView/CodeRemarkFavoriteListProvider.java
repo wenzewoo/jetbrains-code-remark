@@ -32,12 +32,21 @@ import com.intellij.ide.favoritesTreeView.AbstractFavoritesListProvider;
 import com.intellij.ide.favoritesTreeView.FavoritesListNode;
 import com.intellij.ide.favoritesTreeView.FavoritesManager;
 import com.intellij.ide.projectView.PresentationData;
+import com.intellij.ide.projectView.impl.CompoundIconProvider;
 import com.intellij.ide.util.treeView.AbstractTreeNode;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectLocator;
+import com.intellij.openapi.roots.ProjectFileIndex;
+import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.psi.PsiFileSystemItem;
+import com.intellij.psi.util.PsiUtilCore;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -176,12 +185,16 @@ class RemarkNode extends AbstractTreeNode<CodeRemark> {
     public @NotNull Collection<? extends AbstractTreeNode<?>> getChildren() {
         return Collections.emptyList();
     }
+
+    public int getLineNumber() {
+        return codeRemark.getLineNumber();
+    }
 }
 
 class FileNode extends AbstractTreeNode<CodeRemark> {
     private CodeRemark codeRemark;
 
-    private List<AbstractTreeNode<CodeRemark>> children = new ArrayList<>();
+    private List<RemarkNode> children = new ArrayList<>();
 
     protected FileNode(List<AbstractTreeNode<CodeRemark>> list, FavoritesListNode root, Project project, @NotNull CodeRemark value) {
         super(project, value);
@@ -195,12 +208,53 @@ class FileNode extends AbstractTreeNode<CodeRemark> {
         list.add(this);
     }
 
+    private Icon findIcon(VirtualFile file, Project project) {
+        if (null == project) return null;
+
+        PsiFileSystemItem item = PsiUtilCore.findFileSystemItem(project, file);
+        return CompoundIconProvider.findIcon(item, 0);
+    }
+
+    private String getRelativePath(Project project, VirtualFile file) {
+
+        ProjectFileIndex index = ProjectFileIndex.getInstance(project);
+        @Nullable Module module = index.getModuleForFile(file, false);
+        if (null == module) {
+            return null; // FIXME to call computeExternalLocation(file);
+        }
+        VirtualFile root = file;
+        while (true) {
+            VirtualFile parent = root.getParent();
+            if (null == parent) break;
+
+            module = index.getModuleForFile(parent, false);
+            if (null == module) break;
+
+            root = parent;
+        }
+        return file.equals(root) ? null : VfsUtil.getRelativePath(file, root);
+    }
+
     @Override
     protected void update(@NotNull final PresentationData presentation) {
-        presentation.setIcon(CodeRemark.getIcon());// TODO 参照BookmarkNode显示文件类型图标
-        String tip = codeRemark.getFileName();
-        presentation.setTooltip(tip);
-        presentation.setPresentableText(tip);// TODO 参照BookmarkNode显示完整路径
+        // reference :IC source code: platform/lang-impl/src/com/intellij/ide/bookmark/ui/tree/BookmarkNode.kt
+        String fileUrl = codeRemark.getFileUrl();
+        VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(fileUrl);
+        Project project = ProjectLocator.getInstance().guessProjectForFile(file);
+
+        presentation.setIcon(findIcon(file, project));
+
+        String name = file.getPresentableName();
+        presentation.setPresentableText(name);
+        presentation.setTooltip(name);
+        presentation.addText(name, SimpleTextAttributes.REGULAR_ATTRIBUTES);
+
+        VirtualFile parent = file.getParent();
+        String location = getRelativePath(project, parent);
+        if (null != location) {
+            presentation.addText(String.format("  %s", location), SimpleTextAttributes.GRAYED_ATTRIBUTES);
+            presentation.setTooltip(String.format("%s : %s", location, name));
+        }
     }
 
     @Override
@@ -219,6 +273,7 @@ class FileNode extends AbstractTreeNode<CodeRemark> {
     }
 
     public void addChildren(RemarkNode remarkNode) {
-        children.add(remarkNode);// TODO 按行号排序
+        children.add(remarkNode);
+        children.stream().sorted(Comparator.comparingInt(RemarkNode::getLineNumber));
     }
 }
