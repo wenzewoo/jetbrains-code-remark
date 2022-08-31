@@ -92,6 +92,7 @@ public class PopupUtils {
 
         final DefaultActionGroup actionGroup = new DefaultActionGroup();
         final ActionToolbarImpl toolbar = new ActionToolbarImpl("CodeRemarkPopup.toolbar", actionGroup, true);
+        toolbar.setTargetComponent(layoutPanel);
         toolbar.setBorder(JBUI.Borders.empty());
         toolbar.setBackground(UIUtil.getToolTipActionBackground());
         layoutPanel.addToBottom(toolbar);
