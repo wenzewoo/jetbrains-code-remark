@@ -30,13 +30,17 @@ import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.attribute.Attribute;
 import com.googlecode.cqengine.index.hash.HashIndex;
 import com.googlecode.cqengine.index.navigable.NavigableIndex;
+import com.googlecode.cqengine.query.Query;
+import com.googlecode.cqengine.resultset.ResultSet;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.googlecode.cqengine.query.QueryFactory.*;
+import static com.googlecode.cqengine.query.QueryFactory.and;
+import static com.googlecode.cqengine.query.QueryFactory.attribute;
+import static com.googlecode.cqengine.query.QueryFactory.equal;
 
 public class CodeRemarkCQengineRepository implements CodeRemarkRepository {
     protected final static IndexedCollection<CodeRemark> mCodeRemarks = new ConcurrentIndexedCollection<>();
@@ -58,39 +62,53 @@ public class CodeRemarkCQengineRepository implements CodeRemarkRepository {
 
     @Override
     public List<CodeRemark> list(@NotNull final String projectName) {
-        return mCodeRemarks.retrieve(equal(PROJECT_NAME, projectName)).stream()
-                .sorted(Comparator.comparing(CodeRemark::getFileName).thenComparing(CodeRemark::getLineNumber))
-                .collect(Collectors.toList());
+        final Query<CodeRemark> query = equal(PROJECT_NAME, projectName);
+
+        try (final ResultSet<CodeRemark> resultSet = mCodeRemarks.retrieve(query)) {
+            return resultSet.stream()
+                    .sorted(Comparator.comparing(CodeRemark::getFileName).thenComparing(CodeRemark::getLineNumber))
+                    .collect(Collectors.toList());
+        }
     }
 
 
     @Override
     public List<CodeRemark> list(@NotNull final String projectName, @NotNull final String fileName, @NotNull final String contentHash) {
-        return mCodeRemarks.retrieve(
-                and(equal(PROJECT_NAME, projectName),
-                        equal(FILE_NAME, fileName),
-                        equal(CONTENT_HASH, contentHash)))
-                .stream()
-                .sorted(Comparator.comparing(CodeRemark::getLineNumber))
-                .collect(Collectors.toList());
+        final Query<CodeRemark> query = and(
+                equal(PROJECT_NAME, projectName),
+                equal(FILE_NAME, fileName),
+                equal(CONTENT_HASH, contentHash));
+
+        try (final ResultSet<CodeRemark> resultSet = mCodeRemarks.retrieve(query)) {
+            return resultSet.stream()
+                    .sorted(Comparator.comparing(CodeRemark::getLineNumber))
+                    .collect(Collectors.toList());
+        }
     }
 
     @Override
     public boolean exists(@NotNull final String projectName, @NotNull final String fileName, @NotNull final String contentHash) {
-        return mCodeRemarks.retrieve(
-                and(equal(PROJECT_NAME, projectName),
-                        equal(FILE_NAME, fileName),
-                        equal(CONTENT_HASH, contentHash))).size() > 0;
+        final Query<CodeRemark> query = and(
+                equal(PROJECT_NAME, projectName),
+                equal(FILE_NAME, fileName),
+                equal(CONTENT_HASH, contentHash));
+
+        try (final ResultSet<CodeRemark> resultSet = mCodeRemarks.retrieve(query)) {
+            return resultSet.size() > 0;
+        }
     }
 
     @Override
     public CodeRemark get(@NotNull final String projectName, @NotNull final String fileName, @NotNull final String contentHash, final int lineNumber) {
-        return mCodeRemarks.retrieve(
-                and(equal(PROJECT_NAME, projectName),
-                        equal(FILE_NAME, fileName),
-                        equal(CONTENT_HASH, contentHash),
-                        equal(LINE_NUMBER, lineNumber)))
-                .stream().findFirst().orElse(null);
+        final Query<CodeRemark> query = and(
+                equal(PROJECT_NAME, projectName),
+                equal(FILE_NAME, fileName),
+                equal(CONTENT_HASH, contentHash),
+                equal(LINE_NUMBER, lineNumber));
+
+        try (ResultSet<CodeRemark> resultSet = mCodeRemarks.retrieve(query)) {
+            return resultSet.stream().findFirst().orElse(null);
+        }
     }
 
     @Override
@@ -101,36 +119,47 @@ public class CodeRemarkCQengineRepository implements CodeRemarkRepository {
 
     @Override
     public void saveBatch(final List<CodeRemark> codeRemarks) {
-        for (final CodeRemark codeRemark : codeRemarks)
+        for (final CodeRemark codeRemark : codeRemarks) {
             removeWith(codeRemark);
+        }
+
         mCodeRemarks.addAll(codeRemarks);
     }
 
     void removeWith(final CodeRemark codeRemark) {
-        mCodeRemarks.retrieve(
-                and(equal(PROJECT_NAME, codeRemark.getProjectName()),
-                        equal(FILE_NAME, codeRemark.getFileName()),
-                        equal(CONTENT_HASH, codeRemark.getContentHash()),
-                        equal(LINE_NUMBER, codeRemark.getLineNumber())))
-                .stream().forEach(mCodeRemarks::remove);
+        final Query<CodeRemark> query = and(
+                equal(PROJECT_NAME, codeRemark.getProjectName()),
+                equal(FILE_NAME, codeRemark.getFileName()),
+                equal(CONTENT_HASH, codeRemark.getContentHash()),
+                equal(LINE_NUMBER, codeRemark.getLineNumber()));
+
+        try (final ResultSet<CodeRemark> resultSet = mCodeRemarks.retrieve(query)) {
+            resultSet.stream().forEach(mCodeRemarks::remove);
+        }
     }
 
     @Override
     public void remove(@NotNull final String projectName, @NotNull final String fileName, @NotNull final String contentHash, final int lineNumber) {
-        mCodeRemarks.retrieve(
-                and(equal(PROJECT_NAME, projectName),
-                        equal(FILE_NAME, fileName),
-                        equal(CONTENT_HASH, contentHash),
-                        equal(LINE_NUMBER, lineNumber)))
-                .stream().forEach(mCodeRemarks::remove);
+        final Query<CodeRemark> query = and(
+                equal(PROJECT_NAME, projectName),
+                equal(FILE_NAME, fileName),
+                equal(CONTENT_HASH, contentHash),
+                equal(LINE_NUMBER, lineNumber));
+
+        try (final ResultSet<CodeRemark> resultSet = mCodeRemarks.retrieve(query)) {
+            resultSet.stream().forEach(mCodeRemarks::remove);
+        }
     }
 
     @Override
     public void remove(@NotNull final String projectName, @NotNull final String fileName, @NotNull final String contentHash) {
-        mCodeRemarks.retrieve(
-                and(equal(PROJECT_NAME, projectName),
-                        equal(FILE_NAME, fileName),
-                        equal(CONTENT_HASH, contentHash)))
-                .stream().forEach(mCodeRemarks::remove);
+        final Query<CodeRemark> query = and(
+                equal(PROJECT_NAME, projectName),
+                equal(FILE_NAME, fileName),
+                equal(CONTENT_HASH, contentHash));
+
+        try (final ResultSet<CodeRemark> resultSet = mCodeRemarks.retrieve(query)) {
+            resultSet.stream().forEach(mCodeRemarks::remove);
+        }
     }
 }
