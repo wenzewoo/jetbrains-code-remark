@@ -4,7 +4,7 @@
 
 [English](./README.md) | [报告问题](https://github.com/wenzewoo/jetbrains-code-remark/issues)
 
-![](./screenshots/example.png)
+![](./screenshots/example_CN.png)
 
 # 如何安装
 
@@ -18,8 +18,8 @@
 
 - 在任何需要的地方，以下三种方式任选其一，触发Popup弹出层，添加内容。
 
-  - `Alt` + `ENTER` ->  `[MARK] Add/Edit remark` [推荐]
-  - `EditorPopupMenu` / `Tools` ->  `Add remark`
+    - `Alt` + `ENTER` ->  `[MARK] Add/Edit remark` [推荐]
+    - `EditorPopupMenu` / `Tools` ->  `Add remark`
 
 - 在编辑器中使用右键菜单 `Remark Navigation` 预览当前文件添加的所有备注信息。
 

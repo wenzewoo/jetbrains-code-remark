@@ -62,6 +62,7 @@ public class ToggleRemarkMenuAction extends AnAction implements BaseToggleRemark
             return;
         }
         final int lineNumber = EditorUtils.getLineNumber(editor);
+        final String fileName = file.getName();
         final CodeRemark codeRemark = getRepository().get(project, file, lineNumber);
         e.getPresentation().setText((null != codeRemark ? message("editRemark.text") : message("addRemark.text")));
     }

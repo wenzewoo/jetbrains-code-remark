@@ -169,9 +169,10 @@ class RemarkNode extends AbstractTreeNode<CodeRemark> {
     @Override
     protected void update(@NotNull final PresentationData presentation) {
         presentation.setIcon(CodeRemark.getIcon());
-        String tip = codeRemark.getFileName() + ":" + (codeRemark.getLineNumber() + 1);
+        final String tip = codeRemark.getFileName() + ":" + (codeRemark.getLineNumber() + 1);
+        final String text = StringUtils.format("{0}:{1}", codeRemark.getLineNumber() + 1, codeRemark.getText());
         presentation.setTooltip(tip);
-        presentation.setPresentableText(codeRemark.getText()); // TODO 显示行号、日期
+        presentation.setPresentableText(text); // TODO 显示日期
     }
 
     @Override
@@ -254,6 +255,10 @@ class FileNode extends AbstractTreeNode<CodeRemark> {
         // reference :IC source code: platform/lang-impl/src/com/intellij/ide/bookmark/ui/tree/BookmarkNode.kt
         String fileUrl = codeRemark.getFileUrl();
         VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(fileUrl);
+        if (null == file) {
+            return;
+        }
+
         Project project = ProjectLocator.getInstance().guessProjectForFile(file);
 
         presentation.setIcon(findIcon(file, project));

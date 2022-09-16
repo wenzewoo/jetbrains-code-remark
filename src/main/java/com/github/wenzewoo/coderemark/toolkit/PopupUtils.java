@@ -42,7 +42,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.plaf.FontUIResource;
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 
 import static com.github.wenzewoo.coderemark.message.CodeRemarkBundle.message;
 
@@ -77,12 +79,19 @@ public class PopupUtils {
 
         // create ui
         final BorderLayoutPanel layoutPanel = JBUI.Panels.simplePanel();
+        int minW = 300, maxW = 600, minH = 80, maxH = 120;
+        final EditorColorsScheme colorsScheme = editor.getColorsScheme();
+        final FontUIResource font = UIUtil.getFontWithFallback(colorsScheme.getEditorFontName(), Font.PLAIN, colorsScheme.getEditorFontSize());
+
+        final Rectangle2D titleRectangle = SwingUtils.getTextRectangle(title, font);
+        if (null != titleRectangle && titleRectangle.getWidth() > minW) {
+            minW = (int) (titleRectangle.getWidth() + 5);
+        }
 
         final JEditorPane editorPane = new JEditorPane();
         editorPane.setBorder(JBUI.Borders.empty(5));
-        editorPane.setPreferredSize(SwingUtils.createDimension(defaultVal, editorPane.getFont(), 300, 600, 80, 120));
-        final EditorColorsScheme colorsScheme = editor.getColorsScheme();
-        editorPane.setFont(UIUtil.getFontWithFallback(colorsScheme.getEditorFontName(), Font.PLAIN, colorsScheme.getEditorFontSize()));
+        editorPane.setPreferredSize(SwingUtils.createDimension(defaultVal, font, minW, maxW, minH, maxH));
+        editorPane.setFont(font);
         editorPane.setText(defaultVal);
 
         final JBScrollPane scrollPane = new JBScrollPane(editorPane);
@@ -98,7 +107,7 @@ public class PopupUtils {
         layoutPanel.addToBottom(toolbar);
 
         // create popup
-        final JBPopup popup = PopupUtils.createComponent(title + ": " + (lineNumber + 1), layoutPanel, editorPane);
+        final JBPopup popup = PopupUtils.createComponent(title, layoutPanel, editorPane);
         for (final BasePopupToolbarAction action : actions) {
             action.setEvent(new BasePopupToolbarAction.PopupActionEvent(popup, editor, file, editorPane, lineNumber));
             action.registerCustomShortcutSet();

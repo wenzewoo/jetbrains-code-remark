@@ -29,7 +29,7 @@ import com.github.wenzewoo.coderemark.exception.UiIllegalArgumentException;
 import com.github.wenzewoo.coderemark.repository.CodeRemarkRepositoryFactory;
 import com.github.wenzewoo.coderemark.toolkit.EditorUtils;
 import com.github.wenzewoo.coderemark.toolkit.StringUtils;
-import com.intellij.icons.AllIcons;
+import com.intellij.icons.AllIcons.Actions;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.actionSystem.Shortcut;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -40,7 +40,7 @@ import static com.github.wenzewoo.coderemark.message.CodeRemarkBundle.message;
 public class SaveRemarkPopupToolbarAction extends BasePopupToolbarAction {
 
     public SaveRemarkPopupToolbarAction() {
-        super(message("addRemark.confirm"), AllIcons.Actions.Commit);
+        super(message("addRemark.confirm"), Actions.CheckOut);
     }
 
     @Override
@@ -51,8 +51,9 @@ public class SaveRemarkPopupToolbarAction extends BasePopupToolbarAction {
     @Override
     public void actionPerformed(@NotNull final PopupActionEvent event) {
         final String text = event.getEditorPane().getText();
-        if (StringUtils.isEmpty(text))
+        if (StringUtils.isEmpty(text)) {
             throw new UiIllegalArgumentException(message("addRemark.emptyText"));
+        }
 
         EditorUtils.addAfterLineCodeRemark(event.getEditor(), event.getLineNumber(), text);
 

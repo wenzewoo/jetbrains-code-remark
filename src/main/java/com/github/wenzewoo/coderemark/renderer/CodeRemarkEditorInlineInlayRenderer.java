@@ -84,11 +84,15 @@ public class CodeRemarkEditorInlineInlayRenderer
 
     @Override
     public void paint(@NotNull final Inlay inlay, @NotNull final Graphics graphics, @NotNull final Rectangle rectangle, @NotNull final TextAttributes textAttributes) {
-        if (StringUtils.isEmpty(text)) return;
+        if (StringUtils.isEmpty(text)) {
+            return;
+        }
 
         final EditorImpl editor = (EditorImpl) inlay.getEditor();
         final TextAttributes inlineAttributes = getAttributes(editor);
-        if (inlineAttributes == null || inlineAttributes.getForegroundColor() == null) return;
+        if (inlineAttributes == null || inlineAttributes.getForegroundColor() == null) {
+            return;
+        }
 
         final Font font = getFont(editor);
         graphics.setFont(font);
@@ -119,12 +123,16 @@ public class CodeRemarkEditorInlineInlayRenderer
     }
 
     public void onMouseClicked(@NotNull final Inlay inlay, @NotNull final EditorMouseEvent event) {
-        if (isEditorShowing) return;
+        if (isEditorShowing) {
+            return;
+        }
 
         final VirtualFile file = EditorUtils.getVirtualFile(event.getEditor());
         if (null != file) {
             isEditorShowing = true;
-            final JBPopup popup = PopupUtils.createCodeRemarkEditor(event.getEditor(), file, message("editRemark.text"), text,
+            final int lineNumber = EditorUtils.getLineNumber(event.getEditor());
+            final String popupTitle = message("editRemark.title", file.getName(), lineNumber + 1);
+            final JBPopup popup = PopupUtils.createCodeRemarkEditor(event.getEditor(), file, popupTitle, text,
                     new SaveRemarkPopupToolbarAction(), new RemoveRemarkPopupToolbarAction());
             popup.addListener(new JBPopupListener() {
                 @Override
@@ -156,8 +164,9 @@ public class CodeRemarkEditorInlineInlayRenderer
             ((EditorEx) editor).setCustomCursor(CodeRemarkEditorInlineInlayRenderer.class, cursor);
             isHovered = active;
 
-            if (oldState != active)
+            if (oldState != active) {
                 inlay.update();
+            }
         }
     }
 
@@ -211,8 +220,9 @@ public class CodeRemarkEditorInlineInlayRenderer
     }
 
     private TextAttributes getAttributes(final Editor editor) {
-        if (isHovered)
+        if (isHovered) {
             return editor.getColorsScheme().getAttributes(DebuggerColors.INLINED_VALUES_EXECUTION_LINE);
+        }
 
         return editor.getColorsScheme().getAttributes(DebuggerColors.INLINED_VALUES);
     }

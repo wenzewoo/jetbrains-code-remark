@@ -49,7 +49,9 @@ public interface BaseToggleRemarkAction {
 
 
     default void actionPerformed(final Editor editor) {
-        if (null == editor) return;
+        if (null == editor) {
+            return;
+        }
 
         final Project project = editor.getProject();
         final int lineNumber = EditorUtils.getLineNumber(editor);
@@ -60,9 +62,12 @@ public interface BaseToggleRemarkAction {
 
             final List<BasePopupToolbarAction> actions = new ArrayList<>();
             actions.add(new SaveRemarkPopupToolbarAction());
-            if (null != codeRemark)
+            if (null != codeRemark) {
                 actions.add(new RemoveRemarkPopupToolbarAction());
-            final String title = (null != codeRemark ? message("editRemark.text") : message("addRemark.text"));
+            }
+
+            final String fileName = file.getName();
+            final String title = (null != codeRemark ? message("editRemark.title", fileName, lineNumber + 1) : message("addRemark.title", fileName, lineNumber + 1));
             final String defaultVal = (null != codeRemark ? codeRemark.getText() : null);
             PopupUtils.createCodeRemarkEditor(editor, file, title, defaultVal,
                     actions.toArray(new BasePopupToolbarAction[0])).showInBestPositionFor(editor);

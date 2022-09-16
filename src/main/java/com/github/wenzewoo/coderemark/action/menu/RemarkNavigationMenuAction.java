@@ -124,7 +124,7 @@ public class RemarkNavigationMenuAction extends AnAction {
         @NotNull
         String getTextFor(final CodeRemark value) {
             final String text = StringUtils.maxLength(value.getText(), 100);
-            return StringUtils.format("[{0}] {1}", value.getLineNumber() + 1, text);
+            return StringUtils.format("{0}:{1}", value.getLineNumber() + 1, text);
         }
 
         @Override
