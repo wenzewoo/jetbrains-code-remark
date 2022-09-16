@@ -33,7 +33,12 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.popup.*;
+import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.ui.popup.ListPopupStep;
+import com.intellij.openapi.ui.popup.ListSeparator;
+import com.intellij.openapi.ui.popup.MnemonicNavigationFilter;
+import com.intellij.openapi.ui.popup.PopupStep;
+import com.intellij.openapi.ui.popup.SpeedSearchFilter;
 import com.intellij.openapi.util.NlsContexts;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
@@ -60,8 +65,7 @@ public class RemarkNavigationMenuAction extends AnAction {
         final List<CodeRemark> codeRemarks = currentFileRemarks(e);
 
         if (!codeRemarks.isEmpty()) {
-            final String title = StringUtils.format(
-                    message("remarkNavigation.title"), codeRemarks.get(0).getFileName());
+            final String title = message("remarkNavigation.title", codeRemarks.get(0).getFileName());
 
             final Project project = CommonDataKeys.PROJECT.getData(e.getDataContext());
             final Editor editor = CommonDataKeys.EDITOR.getData(e.getDataContext());
@@ -76,8 +80,9 @@ public class RemarkNavigationMenuAction extends AnAction {
         final Editor editor = CommonDataKeys.EDITOR.getData(e.getDataContext());
         final VirtualFile file = CommonDataKeys.VIRTUAL_FILE.getData(e.getDataContext());
 
-        if (null == project || null == editor || null == file)
+        if (null == project || null == editor || null == file) {
             return Collections.emptyList();
+        }
 
         return CodeRemarkRepositoryFactory.getInstance().list(project, file);
     }
@@ -146,8 +151,9 @@ public class RemarkNavigationMenuAction extends AnAction {
             if (null != editor) {
                 final OpenFileDescriptor target = selectedValue.getTarget(project);
 
-                if (null != target)
+                if (null != target) {
                     target.navigateIn(editor);
+                }
             }
             return null;
         }

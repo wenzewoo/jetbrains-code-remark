@@ -44,14 +44,19 @@ import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.psi.util.PsiUtilCore;
 import com.intellij.ui.ColoredTreeCellRenderer;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleTextAttributes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.github.wenzewoo.coderemark.message.CodeRemarkBundle.message;
 
@@ -71,7 +76,7 @@ public class CodeRemarkFavoriteListProvider extends AbstractFavoritesListProvide
         fileRemark.setLineNumber(1);
         fileRemark.setText("");
         AbstractTreeNode<CodeRemark> treeNode = new AbstractTreeNode<>(myProject, fileRemark) {
-            private List<AbstractTreeNode<CodeRemark>> children = new ArrayList<>();
+            private final List<AbstractTreeNode<CodeRemark>> children = new ArrayList<>();
 
             @Override
             protected void update(@NotNull final PresentationData presentation) {
@@ -103,7 +108,9 @@ public class CodeRemarkFavoriteListProvider extends AbstractFavoritesListProvide
     }
 
     private void updateChildren() {
-        if (myProject.isDisposed()) return;
+        if (myProject.isDisposed()) {
+            return;
+        }
         myChildren.clear();
 
         final List<CodeRemark> codeRemarks = CodeRemarkRepositoryFactory.getInstance().list(myProject);
@@ -128,9 +135,10 @@ public class CodeRemarkFavoriteListProvider extends AbstractFavoritesListProvide
     public void customizeRenderer(final ColoredTreeCellRenderer renderer, final JTree tree, @NotNull final Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
         if (value instanceof CodeRemark) {
             final CodeRemark codeRemark = (CodeRemark) value;
-            SimpleTextAttributes attr = new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, Color.BLUE);
-            if (StringUtils.isNotEmpty(codeRemark.getText()))
+            SimpleTextAttributes attr = new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.BLUE);
+            if (StringUtils.isNotEmpty(codeRemark.getText())) {
                 renderer.append(StringUtils.maxLength(codeRemark.getText(), 20) + " ", attr, true);
+            }
 
             renderer.append(codeRemark.getFileName(), attr, true);
             renderer.append(":", attr, true);
@@ -150,7 +158,7 @@ public class CodeRemarkFavoriteListProvider extends AbstractFavoritesListProvide
 }
 
 class RemarkNode extends AbstractTreeNode<CodeRemark> {
-    private CodeRemark codeRemark;
+    private final CodeRemark codeRemark;
 
     protected RemarkNode(Project project, @NotNull CodeRemark value) {
         super(project, value);
@@ -163,7 +171,7 @@ class RemarkNode extends AbstractTreeNode<CodeRemark> {
         presentation.setIcon(CodeRemark.getIcon());
         String tip = codeRemark.getFileName() + ":" + (codeRemark.getLineNumber() + 1);
         presentation.setTooltip(tip);
-        presentation.setPresentableText(codeRemark.getText());//TODO 显示行号、日期
+        presentation.setPresentableText(codeRemark.getText()); // TODO 显示行号、日期
     }
 
     @Override
@@ -192,9 +200,9 @@ class RemarkNode extends AbstractTreeNode<CodeRemark> {
 }
 
 class FileNode extends AbstractTreeNode<CodeRemark> {
-    private CodeRemark codeRemark;
+    private final CodeRemark codeRemark;
 
-    private List<RemarkNode> children = new ArrayList<>();
+    private final List<RemarkNode> children = new ArrayList<>();
 
     protected FileNode(List<AbstractTreeNode<CodeRemark>> list, FavoritesListNode root, Project project, @NotNull CodeRemark value) {
         super(project, value);
@@ -209,7 +217,9 @@ class FileNode extends AbstractTreeNode<CodeRemark> {
     }
 
     private Icon findIcon(VirtualFile file, Project project) {
-        if (null == project) return null;
+        if (null == project) {
+            return null;
+        }
 
         PsiFileSystemItem item = PsiUtilCore.findFileSystemItem(project, file);
         return CompoundIconProvider.findIcon(item, 0);
@@ -225,10 +235,14 @@ class FileNode extends AbstractTreeNode<CodeRemark> {
         VirtualFile root = file;
         while (true) {
             VirtualFile parent = root.getParent();
-            if (null == parent) break;
+            if (null == parent) {
+                break;
+            }
 
             module = index.getModuleForFile(parent, false);
-            if (null == module) break;
+            if (null == module) {
+                break;
+            }
 
             root = parent;
         }
@@ -274,6 +288,6 @@ class FileNode extends AbstractTreeNode<CodeRemark> {
 
     public void addChildren(RemarkNode remarkNode) {
         children.add(remarkNode);
-        children.stream().sorted(Comparator.comparingInt(RemarkNode::getLineNumber));
+        children.sort(Comparator.comparingInt(RemarkNode::getLineNumber));
     }
 }

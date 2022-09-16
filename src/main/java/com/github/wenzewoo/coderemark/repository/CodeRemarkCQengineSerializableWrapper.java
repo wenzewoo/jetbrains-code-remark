@@ -28,7 +28,12 @@ import com.github.wenzewoo.coderemark.CodeRemark;
 import com.github.wenzewoo.coderemark.toolkit.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -105,37 +110,40 @@ public class CodeRemarkCQengineSerializableWrapper implements CodeRemarkReposito
     void persistToDisk(final String projectName, final String fileName, final String contentHash) {
         final long begin = System.currentTimeMillis();
         final File baseDir = mBasePath.toFile();
-        if (!baseDir.exists())
+        if (!baseDir.exists()) {
             baseDir.mkdirs(); // if baseDir not exists, mkdir it.
+        }
 
         final File saveDir = Paths.get(baseDir.getAbsolutePath(), projectName).toFile();
-        if (!saveDir.exists())
+        if (!saveDir.exists()) {
             saveDir.mkdirs(); // if saveDir not exists, mkdir it.
+        }
 
         // ~/.code-remark/{projectName}/hashMD5.XXX.java
         final File localFile = Paths.get(saveDir.getAbsolutePath(),
                 StringUtils.format("{0}.{1}", contentHash, fileName)).toFile();
         final List<CodeRemark> codeRemarks = list(projectName, fileName, contentHash);
 
-        if (codeRemarks.size() == 0 && localFile.exists())
+        if (codeRemarks.size() == 0 && localFile.exists()) {
             localFile.delete(); // if not more data, remove disk file.
+        }
 
         if (codeRemarks.size() > 0) {
-            if (localFile.exists())
+            if (localFile.exists()) {
                 localFile.delete(); // Remove old, write new
+            }
             try (final ObjectOutputStream stream = new ObjectOutputStream(
                     new FileOutputStream(localFile))) {
                 stream.writeObject(codeRemarks.toArray(new CodeRemark[0]));
             } catch (final IOException ignored) {
             }
         }
-
-        // System.out.printf("persistToDisk(%s, %s) %d ms\n", projectName, fileName, System.currentTimeMillis() - begin);
-        // CodeRemarkCQengineRepository.mCodeRemarks.forEach(System.out::println);
     }
 
     void initializeFromDisk(@NotNull final String projectName) {
-        if (initialized) return; // Skipped.
+        if (initialized) {
+            return; // Skipped.
+        }
 
         try {
             // ~/.code-remark/{projectName}
@@ -152,8 +160,9 @@ public class CodeRemarkCQengineSerializableWrapper implements CodeRemarkReposito
                     } catch (final Throwable ignored) {
                     }
 
-                    if (!codeRemarks.isEmpty())
+                    if (!codeRemarks.isEmpty()) {
                         CodeRemarkCQengineRepository.mCodeRemarks.addAll(codeRemarks);
+                    }
                 }
             });
         } catch (final IOException ignored) {
