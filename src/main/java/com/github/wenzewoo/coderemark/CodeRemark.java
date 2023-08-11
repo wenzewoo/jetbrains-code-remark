@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021 吴汶泽 <wenzewoo@gmail.com>
+ * Copyright (c) 2023 吴汶泽 <wenzewoo@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,11 +37,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.io.Serial;
 import java.io.Serializable;
 
 public class CodeRemark implements Serializable, Navigatable {
-
+    @Serial
     private static final long serialVersionUID = 5906557169110070235L;
+    @Deprecated
     private String projectName;
     private String fileName;
     private String fileUrl;
@@ -103,7 +105,7 @@ public class CodeRemark implements Serializable, Navigatable {
         return target.canNavigateToSource();
     }
 
-    
+
     public OpenFileDescriptor getTarget(@Nullable Project project) {
         // If target is null, indicates that the object is deserialized.
         if (null == target) {

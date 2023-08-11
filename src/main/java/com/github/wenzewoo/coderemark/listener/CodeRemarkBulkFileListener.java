@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021 吴汶泽 <wenzewoo@gmail.com>
+ * Copyright (c) 2023 吴汶泽 <wenzewoo@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,23 +40,22 @@ import com.intellij.openapi.vfs.newvfs.events.VFilePropertyChangeEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class CodeRemarkBulkFileListener implements BulkFileListener {
-    private final static CodeRemarkRepository mCodeRemarkRepository = CodeRemarkRepositoryFactory.getInstance();
 
     @Override
     public void after(@NotNull final List<? extends VFileEvent> events) {
-        events.stream()
-                .filter(this::needFilter)
-                .forEach(event -> {
-                    if (event instanceof VFileDeleteEvent) {
-                        afterDeleteChange((VFileDeleteEvent) event);
-                    } else if (event instanceof VFileMoveEvent) {
-                        afterMoveChange((VFileMoveEvent) event);
-                    } else if (event instanceof VFilePropertyChangeEvent) {
-                        afterPropertyChange(((VFilePropertyChangeEvent) event));
-                    }
-                });
+        final Consumer<? super VFileEvent> fileEventConsumer = event -> {
+            if (event instanceof VFileDeleteEvent) {
+                afterDeleteChange((VFileDeleteEvent) event);
+            } else if (event instanceof VFileMoveEvent) {
+                afterMoveChange((VFileMoveEvent) event);
+            } else if (event instanceof VFilePropertyChangeEvent) {
+                afterPropertyChange(((VFilePropertyChangeEvent) event));
+            }
+        };
+        events.stream().filter(this::needFilter).forEach(fileEventConsumer);
     }
 
     private Project getCurrentProject(@NotNull final VirtualFile file) {
@@ -69,9 +68,10 @@ public class CodeRemarkBulkFileListener implements BulkFileListener {
 
         if (null == project) return; // Skipped
 
-        if (mCodeRemarkRepository.exists(project, file)) {
+        final CodeRemarkRepository codeRemarkRepository = CodeRemarkRepositoryFactory.getInstance(project);
+        if (codeRemarkRepository.exists(project, file)) {
             WriteCommandAction.runWriteCommandAction(project, () -> {
-                mCodeRemarkRepository.remove(project, file);
+                codeRemarkRepository.remove(project, file);
             });
         }
     }
@@ -87,16 +87,17 @@ public class CodeRemarkBulkFileListener implements BulkFileListener {
 
         if (null == project) return; // Skipped.
 
+        final CodeRemarkRepository codeRemarkRepository = CodeRemarkRepositoryFactory.getInstance(project);
 
         final String oldContentHash = CodeRemark.createContentHash(
                 VirtualFileUtils.getRelativePath(project, oldPath));
-        final List<CodeRemark> codeRemarks = mCodeRemarkRepository.list(project.getName(), oldFileName, oldContentHash);
+        final List<CodeRemark> codeRemarks = codeRemarkRepository.list(oldFileName, oldContentHash);
 
-        if (codeRemarks.size() > 0) {
+        if (!codeRemarks.isEmpty()) {
 
             WriteCommandAction.runWriteCommandAction(project, () -> {
                 // Remove old coderemarks
-                mCodeRemarkRepository.remove(project.getName(), oldFileName, oldContentHash);
+                codeRemarkRepository.remove(oldFileName, oldContentHash);
                 // Save new coderemarks
                 final String newFileName = newFile.getName();
                 final String newContentHash = CodeRemark.createContentHash(project, newFile);
@@ -104,7 +105,7 @@ public class CodeRemarkBulkFileListener implements BulkFileListener {
                     codeRemark.setFileName(newFileName);
                     codeRemark.setContentHash(newContentHash);
                 }
-                mCodeRemarkRepository.saveBatch(codeRemarks);
+                codeRemarkRepository.saveBatch(codeRemarks);
             });
 
         }

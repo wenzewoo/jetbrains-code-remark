@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021 吴汶泽 <wenzewoo@gmail.com>
+ * Copyright (c) 2023 吴汶泽 <wenzewoo@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,32 +33,28 @@ import java.util.List;
 
 public interface CodeRemarkRepository {
 
-    default List<CodeRemark> list(@NotNull final Project project) {
-        return list(project.getName());
-    }
-
-    List<CodeRemark> list(@NotNull String projectName);
+    List<CodeRemark> list();
 
 
     default List<CodeRemark> list(@NotNull final Project project, @NotNull final VirtualFile file) {
-        return list(project.getName(), file.getName(), CodeRemark.createContentHash(project, file));
+        return list(file.getName(), CodeRemark.createContentHash(project, file));
     }
 
-    List<CodeRemark> list(@NotNull String projectName, @NotNull String fileName, @NotNull String contentHash);
+    List<CodeRemark> list(@NotNull String fileName, @NotNull String contentHash);
 
 
     default boolean exists(@NotNull final Project project, @NotNull final VirtualFile file) {
-        return exists(project.getName(), file.getName(), CodeRemark.createContentHash(project, file));
+        return exists(file.getName(), CodeRemark.createContentHash(project, file));
     }
 
-    boolean exists(@NotNull String projectName, @NotNull String fileName, @NotNull String contentHash);
+    boolean exists(@NotNull String fileName, @NotNull String contentHash);
 
 
     default CodeRemark get(@NotNull Project project, @NotNull VirtualFile file, int lineNumber) {
-        return get(project.getName(), file.getName(), CodeRemark.createContentHash(project, file), lineNumber);
+        return get(file.getName(), CodeRemark.createContentHash(project, file), lineNumber);
     }
 
-    CodeRemark get(@NotNull String projectName, @NotNull String fileName, @NotNull String contentHash, int lineNumber);
+    CodeRemark get(@NotNull String fileName, @NotNull String contentHash, int lineNumber);
 
     void save(CodeRemark codeRemark);
 
@@ -66,15 +62,15 @@ public interface CodeRemarkRepository {
 
 
     default void remove(@NotNull Project project, @NotNull VirtualFile file, int lineNumber) {
-        remove(project.getName(), file.getName(), CodeRemark.createContentHash(project, file), lineNumber);
+        remove(file.getName(), CodeRemark.createContentHash(project, file), lineNumber);
     }
 
-    void remove(@NotNull String projectName, @NotNull String fileName, @NotNull String contentHash, int lineNumber);
+    void remove(@NotNull String fileName, @NotNull String contentHash, int lineNumber);
 
-    
+
     default void remove(@NotNull Project project, @NotNull VirtualFile file) {
-        remove(project.getName(), file.getName(), CodeRemark.createContentHash(project, file));
+        remove(file.getName(), CodeRemark.createContentHash(project, file));
     }
 
-    void remove(@NotNull String projectName, @NotNull String fileName, @NotNull String contentHash);
+    void remove(@NotNull String fileName, @NotNull String contentHash);
 }

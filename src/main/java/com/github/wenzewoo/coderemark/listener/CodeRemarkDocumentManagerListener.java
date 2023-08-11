@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021 吴汶泽 <wenzewoo@gmail.com>
+ * Copyright (c) 2023 吴汶泽 <wenzewoo@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,6 @@ import java.util.stream.Collectors;
 
 public class CodeRemarkDocumentManagerListener implements FileDocumentManagerListener {
 
-    private final static CodeRemarkRepository mCodeRemarkRepository = CodeRemarkRepositoryFactory.getInstance();
 
     @NotNull
     public CodeRemarkListener getPublisher(final Project project) {
@@ -68,15 +67,16 @@ public class CodeRemarkDocumentManagerListener implements FileDocumentManagerLis
             final List<Inlay<? extends CodeRemarkEditorInlineInlayRenderer>> inlays = editors[0].getInlayModel()
                     .getAfterLineEndElementsInRange(0, endOffset, CodeRemarkEditorInlineInlayRenderer.class);
 
-            if (inlays.size() > 0) {
+            if (!inlays.isEmpty()) {
                 final List<CodeRemark> codeRemarks = inlays.stream().map(inlay -> {
                     final int newLineNumber = document.getLineNumber(inlay.getOffset());
                     return new CodeRemark(project, file, newLineNumber, inlay.getRenderer().getText());
                 }).collect(Collectors.toList());
 
+                final CodeRemarkRepository codeRemarkRepository = CodeRemarkRepositoryFactory.getInstance(project);
                 WriteCommandAction.runWriteCommandAction(project, () -> {
-                    mCodeRemarkRepository.remove(project, file);
-                    mCodeRemarkRepository.saveBatch(codeRemarks);
+                    codeRemarkRepository.remove(project, file);
+                    codeRemarkRepository.saveBatch(codeRemarks);
                     getPublisher(project).codeRemarkChanged(project, file);
                 });
             }

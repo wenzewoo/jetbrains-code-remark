@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021 吴汶泽 <wenzewoo@gmail.com>
+ * Copyright (c) 2023 吴汶泽 <wenzewoo@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,8 +27,16 @@ package com.github.wenzewoo.coderemark.listener;
 import com.github.wenzewoo.coderemark.renderer.CodeRemarkEditorInlineInlayRenderer;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.editor.*;
-import com.intellij.openapi.editor.event.*;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.EditorCustomElementRenderer;
+import com.intellij.openapi.editor.EditorFactory;
+import com.intellij.openapi.editor.Inlay;
+import com.intellij.openapi.editor.InlayModel;
+import com.intellij.openapi.editor.event.EditorEventMulticaster;
+import com.intellij.openapi.editor.event.EditorMouseEvent;
+import com.intellij.openapi.editor.event.EditorMouseEventArea;
+import com.intellij.openapi.editor.event.EditorMouseListener;
+import com.intellij.openapi.editor.event.EditorMouseMotionListener;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,6 +49,7 @@ public class CodeRemarkEditorInlineInlayListener
     private boolean isListening = false;
     private Inlay<?> lastHoveredInlay = null;
 
+    @SuppressWarnings("deprecation")
     public static CodeRemarkEditorInlineInlayListener getInstance(@NotNull final Project project) {
         return ServiceManager.getService(project, CodeRemarkEditorInlineInlayListener.class);
     }
@@ -60,8 +69,7 @@ public class CodeRemarkEditorInlineInlayListener
 
         if (lastHoveredInlay != null) {
             final EditorCustomElementRenderer renderer = lastHoveredInlay.getRenderer();
-            if (renderer instanceof CodeRemarkEditorInlineInlayRenderer) {
-                final CodeRemarkEditorInlineInlayRenderer codeRemarkRender = (CodeRemarkEditorInlineInlayRenderer) renderer;
+            if (renderer instanceof CodeRemarkEditorInlineInlayRenderer codeRemarkRender) {
                 if (lastHoveredInlay != inlay)
                     codeRemarkRender.onMouseExited(lastHoveredInlay, event);
                 lastHoveredInlay = null;
@@ -70,8 +78,7 @@ public class CodeRemarkEditorInlineInlayListener
 
         if (inlay != null) {
             final EditorCustomElementRenderer renderer = inlay.getRenderer();
-            if (renderer instanceof CodeRemarkEditorInlineInlayRenderer) {
-                final CodeRemarkEditorInlineInlayRenderer codeRemarkRender = (CodeRemarkEditorInlineInlayRenderer) renderer;
+            if (renderer instanceof CodeRemarkEditorInlineInlayRenderer codeRemarkRender) {
                 codeRemarkRender.onMouseMoved(inlay, event);
                 lastHoveredInlay = inlay;
             } else lastHoveredInlay = null;

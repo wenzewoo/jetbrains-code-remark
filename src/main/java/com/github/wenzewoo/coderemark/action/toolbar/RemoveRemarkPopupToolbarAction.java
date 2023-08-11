@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021 吴汶泽 <wenzewoo@gmail.com>
+ * Copyright (c) 2023 吴汶泽 <wenzewoo@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -53,7 +53,7 @@ public class RemoveRemarkPopupToolbarAction extends BasePopupToolbarAction {
 
             WriteCommandAction.runWriteCommandAction(event.getProject(), () -> {
                 // Remove from repository.
-                CodeRemarkRepositoryFactory.getInstance().remove(
+                CodeRemarkRepositoryFactory.getInstance(event.getProject()).remove(
                         event.getProject(), event.getFile(), event.getLineNumber());
 
                 getPublisher().codeRemarkChanged(event.getProject(), event.getFile());

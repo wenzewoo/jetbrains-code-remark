@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021 吴汶泽 <wenzewoo@gmail.com>
+ * Copyright (c) 2023 吴汶泽 <wenzewoo@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -59,7 +59,7 @@ public class SaveRemarkPopupToolbarAction extends BasePopupToolbarAction {
 
         WriteCommandAction.runWriteCommandAction(event.getProject(), () -> {
             // Save to repository.
-            CodeRemarkRepositoryFactory.getInstance().save(
+            CodeRemarkRepositoryFactory.getInstance(event.getProject()).save(
                     new CodeRemark(event.getProject(), event.getFile(), event.getLineNumber(), text));
             getPublisher().codeRemarkChanged(event.getProject(), event.getFile());
         });

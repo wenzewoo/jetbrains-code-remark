@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021 吴汶泽 <wenzewoo@gmail.com>
+ * Copyright (c) 2023 吴汶泽 <wenzewoo@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -113,7 +113,7 @@ public class CodeRemarkFavoriteListProvider extends AbstractFavoritesListProvide
         }
         myChildren.clear();
 
-        final List<CodeRemark> codeRemarks = CodeRemarkRepositoryFactory.getInstance().list(myProject);
+        final List<CodeRemark> codeRemarks = CodeRemarkRepositoryFactory.getInstance(myProject).list();
         Map<String, FileNode> nodeMap = new HashMap<>();
         for (final CodeRemark codeRemark : codeRemarks) {
             String file = codeRemark.getFileName();
@@ -128,13 +128,16 @@ public class CodeRemarkFavoriteListProvider extends AbstractFavoritesListProvide
             fileNode.addChildren(node);
 
         }
-        FavoritesManager.getInstance(myProject).fireListeners(getListName(myProject));
+        final String listName = getListName(myProject);
+        if (null != listName) {
+            //noinspection deprecation
+            FavoritesManager.getInstance(myProject).fireListeners(listName);
+        }
     }
 
     @Override
     public void customizeRenderer(final ColoredTreeCellRenderer renderer, final JTree tree, @NotNull final Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
-        if (value instanceof CodeRemark) {
-            final CodeRemark codeRemark = (CodeRemark) value;
+        if (value instanceof CodeRemark codeRemark) {
             SimpleTextAttributes attr = new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.BLUE);
             if (StringUtils.isNotEmpty(codeRemark.getText())) {
                 renderer.append(StringUtils.maxLength(codeRemark.getText(), 20) + " ", attr, true);

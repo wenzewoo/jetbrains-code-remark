@@ -6,9 +6,15 @@
 
 ![](./screenshots/example_CN.png)
 
+# 演示
+
+![](./screenshots/example.gif)
+
 # 如何安装
 
-在IDE插件市场搜索 `Code Remark` 或通过[releases](https://github.com/wenzewoo/jetbrains-code-remark/releases)下载安装包进行手动安装。
+- 在IDE插件市场搜索 `Code Remark`
+  [https://plugins.jetbrains.com/plugin/17805-code-remark](https://plugins.jetbrains.com/plugin/17805-code-remark)
+- 或通过[releases](https://github.com/wenzewoo/jetbrains-code-remark/releases)下载安装包进行手动安装。
 
 # 使用说明
 
@@ -23,7 +29,7 @@
 
 - 在编辑器中使用右键菜单 `Remark Navigation` 预览当前文件添加的所有备注信息。
 
-- 在`View` -> `Tool Windows` -> `Favorites` -> `Remarks` 视图中查看当前项目所有的备注信息。
+- 在`View` -> `Tool Windows` -> `Bookmarks` -> `Remarks` 视图中查看当前项目所有的备注信息。
 
 # 快捷键
 
@@ -33,3 +39,7 @@
 - 取消：<`ESC`>
 
 > 可以通过 `Preferences` - `Keymap` 搜索 `remark` ，为指定的操作配置相应的快捷键
+
+# 如何将代码备注同步到Git仓库？
+
+相关的文件位于`${yourProject}/.idea/code-remark.xml`，将其加入到Git版本库中即可。

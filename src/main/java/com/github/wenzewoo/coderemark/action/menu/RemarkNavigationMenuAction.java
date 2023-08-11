@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021 吴汶泽 <wenzewoo@gmail.com>
+ * Copyright (c) 2023 吴汶泽 <wenzewoo@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -84,7 +84,7 @@ public class RemarkNavigationMenuAction extends AnAction {
             return Collections.emptyList();
         }
 
-        return CodeRemarkRepositoryFactory.getInstance().list(project, file);
+        return CodeRemarkRepositoryFactory.getInstance(project).list(project, file);
     }
 
     static class CodeRemarkNavigationListPopupStep implements ListPopupStep<CodeRemark> {

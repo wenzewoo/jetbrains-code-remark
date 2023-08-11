@@ -21,17 +21,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.github.wenzewoo.coderemark.repository;
+package com.github.wenzewoo.coderemark.repository.persistent;
 
-import com.github.wenzewoo.coderemark.repository.persistent.CodeRemarkPersistentStateRepository;
-import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.project.Project;
-import org.jetbrains.annotations.NotNull;
+import com.github.wenzewoo.coderemark.CodeRemark;
 
-public class CodeRemarkRepositoryFactory {
+import java.util.ArrayList;
+import java.util.List;
 
-    @SuppressWarnings("deprecation")
-    public static CodeRemarkRepository getInstance(@NotNull final Project project) {
-        return ServiceManager.getService(project, CodeRemarkPersistentStateRepository.class);
+public class CodeRemarkPersistentState {
+    private String version;
+    private List<CodeRemark> projectCodeRemarks = new ArrayList<>();
+
+    public CodeRemarkPersistentState() {
+    }
+
+    public CodeRemarkPersistentState(String version) {
+        this.version = version;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public List<CodeRemark> getProjectCodeRemarks() {
+        return projectCodeRemarks;
+    }
+
+    public void setProjectCodeRemarks(List<CodeRemark> projectCodeRemarks) {
+        this.projectCodeRemarks = projectCodeRemarks;
     }
 }

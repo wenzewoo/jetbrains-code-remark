@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021 吴汶泽 <wenzewoo@gmail.com>
+ * Copyright (c) 2023 吴汶泽 <wenzewoo@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,6 +35,7 @@ import com.github.wenzewoo.coderemark.toolkit.PopupUtils;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,8 +44,8 @@ import static com.github.wenzewoo.coderemark.message.CodeRemarkBundle.message;
 
 public interface BaseToggleRemarkAction {
 
-    default CodeRemarkRepository getRepository() {
-        return CodeRemarkRepositoryFactory.getInstance();
+    default CodeRemarkRepository getRepository(@NotNull final Project project) {
+        return CodeRemarkRepositoryFactory.getInstance(project);
     }
 
 
@@ -58,7 +59,7 @@ public interface BaseToggleRemarkAction {
         final VirtualFile file = EditorUtils.getVirtualFile(editor);
 
         if (null != file && null != project) {
-            final CodeRemark codeRemark = getRepository().get(project, file, lineNumber);
+            final CodeRemark codeRemark = getRepository(project).get(project, file, lineNumber);
 
             final List<BasePopupToolbarAction> actions = new ArrayList<>();
             actions.add(new SaveRemarkPopupToolbarAction());

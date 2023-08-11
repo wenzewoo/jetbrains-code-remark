@@ -1,7 +1,7 @@
 <!--
   ~ MIT License
   ~
-  ~ Copyright (c) 2021 吴汶泽 <wenzewoo@gmail.com>
+  ~ Copyright (c) 2023 吴汶泽 <wenzewoo@gmail.com>
   ~
   ~ Permission is hereby granted, free of charge, to any person obtaining a copy
   ~ of this software and associated documentation files (the "Software"), to deal
@@ -46,11 +46,12 @@
             </ol>
         </li>
         <li>In the editor, use the right-click menu <b>Remark Navigation</b> to preview all the remarks added in the current file.</li>
-        <li>View all the remarks of the current project in the <b>View</b> -> <b>Tool Windows</b> -> <b>Favorites</b> -> <b>Remarks</b> view.</li>
+        <li>View all the remarks of the current project in the <b>View</b> -> <b>Tool Windows</b> -> <b>Bookmarks</b> -> <b>Remarks</b> view.</li>
     </ol>
 
 
     <br/>
+    <img src="https://cdn.jsdelivr.net/gh/wenzewoo/jetbrains-code-remark/screenshots/example.gif"/>
     <img src="https://cdn.jsdelivr.net/gh/wenzewoo/jetbrains-code-remark/screenshots/example.png"/>
     <img src="https://cdn.jsdelivr.net/gh/wenzewoo/jetbrains-code-remark/screenshots/example_CN.png"/>
     <br/>
@@ -86,12 +87,16 @@
 
         <listener topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"
                   class="com.github.wenzewoo.coderemark.listener.CodeRemarkBulkFileListener"/>
+
+        <listener topic="com.intellij.openapi.project.ProjectManagerListener"
+                  class="com.github.wenzewoo.coderemark.listener.CodeRemarkDataMigrationProjectListener"/>
     </projectListeners>
 
     <extensions defaultExtensionNs="com.intellij">
         <projectService
                 serviceImplementation="com.github.wenzewoo.coderemark.listener.CodeRemarkEditorInlineInlayListener"/>
-
+        <projectService
+                serviceImplementation="com.github.wenzewoo.coderemark.repository.persistent.CodeRemarkPersistentStateRepository"/>
         <intentionAction>
             <className>com.github.wenzewoo.coderemark.action.intention.ToggleRemarkIntentionAction</className>
         </intentionAction>

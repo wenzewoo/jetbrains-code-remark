@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021 吴汶泽 <wenzewoo@gmail.com>
+ * Copyright (c) 2023 吴汶泽 <wenzewoo@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -62,8 +62,7 @@ public class ToggleRemarkMenuAction extends AnAction implements BaseToggleRemark
             return;
         }
         final int lineNumber = EditorUtils.getLineNumber(editor);
-        final String fileName = file.getName();
-        final CodeRemark codeRemark = getRepository().get(project, file, lineNumber);
+        final CodeRemark codeRemark = getRepository(project).get(project, file, lineNumber);
         e.getPresentation().setText((null != codeRemark ? message("editRemark.text") : message("addRemark.text")));
     }
 
