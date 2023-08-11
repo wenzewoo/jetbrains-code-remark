@@ -15,10 +15,6 @@ repositories {
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 }
 
-dependencies {
-    implementation 'com.googlecode.cqengine:cqengine:3.6.0'
-}
-
 configurations {
     all*.exclude group: 'org.xerial', module: 'sqlite-jdbc'
 }
